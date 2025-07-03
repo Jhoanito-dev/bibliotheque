@@ -4,12 +4,16 @@
 <body>
     <h1>Ajouter un adhérent</h1>
     <form th:action="@{/bibliothecaire/ajouter-adherent}" th:object="${adherent}" method="post">
-        <div><label>Nom : <input type="text" th:field="*{nom}" /></label></div>
-        <div><label>Email : <input type="email" th:field="*{email}" /></label></div>
-        <div><label>Type de profil : <input type="text" th:field="*{typeProfil}" /></label></div>
+        <div><label>Nom : <input th:field="*{nom}" /></label></div>
+        <div><label>Email : <input th:field="*{email}" /></label></div>
         <div><label>Âge : <input type="number" th:field="*{age}" /></label></div>
-        <div><label>Cotisation payée : <input type="checkbox" th:field="*{cotisationPayee}" /></label></div>
-        <div><label>Date expiration cotisation : <input type="date" th:field="*{dateExpirationCotisation}" /></label></div>
+        <div><label>Catégorie : 
+            <select th:field="*{categorie}">
+                <option value="Etudiant">Etudiant</option>
+                <option value="Professeur">Professeur</option>
+                <option value="Autre">Autre</option>
+            </select>
+        </label></div>
         <div><input type="submit" value="Ajouter" /></div>
     </form>
     <a th:href="@{/bibliothecaire/dashboard}">Retour</a>
