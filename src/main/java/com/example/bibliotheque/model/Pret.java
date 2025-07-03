@@ -26,6 +26,7 @@ public class Pret {
     private LocalDate dateRetourPrevus;
     private LocalDate dateRetourEffectif;
     private boolean penaliteActive;
-    private boolean prolonge; // Indique si le prêt peut être prolongé
-    private int nombreProlongements; // Nouveau champ pour le nombre de prolongations
+    private boolean prolonge; // Indique si le prêt a été prolongé
+    private int nombreProlongements; // Nombre de prolongations effectuées
+    private String typePret; // "surplace" ou "maison"
 }

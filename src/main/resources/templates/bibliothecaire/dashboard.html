@@ -21,26 +21,32 @@
     </table>
     <h2>Adhérents</h2>
     <table border="1">
-        <tr><th>Nom</th><th>Email</th><th>Âge</th><th>Pénalité</th></tr>
+        <tr><th>Nom</th><th>Email</th><th>Âge</th><th>Catégorie</th><th>Quota Prêt</th><th>Quota Réservation</th><th>Quota Prolongement</th><th>Pénalité</th></tr>
         <tr th:each="adherent : ${adherents}">
             <td th:text="${adherent.nom}"></td>
             <td th:text="${adherent.email}"></td>
             <td th:text="${adherent.age}"></td>
+            <td th:text="${adherent.categorie}"></td>
+            <td th:text="${adherent.quotaPret}"></td>
+            <td th:text="${adherent.quotaReservation}"></td>
+            <td th:text="${adherent.quotaProlongement}"></td>
             <td th:text="${adherent.penaliteJusquAu}"></td>
         </tr>
     </table>
     <h2>Prêts en cours</h2>
-<table border="1">
-    <tr><th>Adhérent</th><th>Livre</th><th>Date emprunt</th><th>Date retour prévue</th><th>Nombre prolongements</th><th>Retourner</th></tr>
-    <tr th:each="pret : ${prets}">
-        <td th:text="${pret.adherent.nom}"></td>
-        <td th:text="${pret.livre.titre}"></td>
-        <td th:text="${pret.dateEmprunt}"></td>
-        <td th:text="${pret.dateRetourPrevus}"></td>
-        <td th:text="${pret.nombreProlongements}"></td>
-        <td><a th:href="@{/bibliothecaire/retourner-livre/{id}(id=${pret.id})}">Retourner</a></td>
-    </tr>
-</table>
+    <table border="1">
+        <tr><th>Adhérent</th><th>Livre</th><th>Date emprunt</th><th>Date retour prévue</th><th>Type</th><th>Prolongements</th><th>Prolonger</th><th>Retourner</th></tr>
+        <tr th:each="pret : ${prets}">
+            <td th:text="${pret.adherent.nom}"></td>
+            <td th:text="${pret.livre.titre}"></td>
+            <td th:text="${pret.dateEmprunt}"></td>
+            <td th:text="${pret.dateRetourPrevus}"></td>
+            <td th:text="${pret.typePret}"></td>
+            <td th:text="${pret.nombreProlongements}"></td>
+            <td><a th:href="@{/bibliothecaire/prolonger-pret/{id}(id=${pret.id})}" th:unless="${pret.prolonge or pret.nombreProlongements >= pret.adherent.quotaProlongement}">Prolonger</a></td>
+            <td><a th:href="@{/bibliothecaire/retourner-livre/{id}(id=${pret.id})}">Retourner</a></td>
+        </tr>
+    </table>
     <h2>Réservations</h2>
     <table border="1">
         <tr><th>Adhérent</th><th>Livre</th><th>Date reservation</th><th>Date limite retrait</th></tr>

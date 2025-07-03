@@ -15,9 +15,10 @@ public class Adherent {
     private Long id;
     private String nom;
     private String email;
-    private String typeProfil; // étudiant, professionnel, professeur
-    private boolean cotisationPayee;
-    private LocalDate dateExpirationCotisation;
-    private Integer age; // Changez int en Integer pour permettre null
-    private LocalDate penaliteJusquAu; // Date jusqu'à laquelle la pénalité est active
+    private Integer age;
+    private LocalDate penaliteJusquAu;
+    private String categorie; // ex: "Etudiant", "Professeur", "Autre"
+    private int quotaPret; // Quota de prêts actifs
+    private int quotaReservation; // Quota de réservations actives
+    private int quotaProlongement; // Quota de prolongements autorisés
 }
