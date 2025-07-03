@@ -21,5 +21,6 @@ public class Pret {
     private Exemplaire exemplaire;
     private String typePret; // sur place, à domicile
     private LocalDate dateRetour;
+    private int nombreProlongements; // Nouvel attribut pour le quota de prolongement
     private boolean prolonge;
 }

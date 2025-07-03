@@ -18,5 +18,6 @@ public class Adherent {
     private String typeProfil; // étudiant, professionnel, professeur
     private boolean cotisationPayee;
     private LocalDate dateExpirationCotisation;
-    private String penalites; // ex: "Interdiction jusqu'au 30/06/2025"
+    private Integer age; // Changez int en Integer pour permettre null
+    private LocalDate penaliteJusquAu; // Date jusqu'à laquelle la pénalité est active
 }
