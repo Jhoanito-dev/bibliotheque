@@ -1,6 +1,9 @@
 package com.example.bibliotheque.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +18,6 @@ public class Livre {
     private String auteur;
     private String isbn;
     private String categorie;
-    private String restrictions;
     private int nombreExemplaires;
+    private int ageMinimum; // Nouvel attribut pour restriction 18+
 }

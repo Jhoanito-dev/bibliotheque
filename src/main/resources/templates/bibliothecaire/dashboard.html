@@ -2,7 +2,26 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head><title>Tableau de bord Bibliothécaire</title></head>
 <body>
-    <h1>Bienvenue, Bibliothécaire</h1>
-    <p>Tableau de bord en construction...</p>
+    <h1>Tableau de bord Bibliothécaire</h1>
+    <a th:href="@{/bibliothecaire/ajouter-livre}">Ajouter un livre</a> | 
+    <a th:href="@{/bibliothecaire/ajouter-adherent}">Ajouter un adhérent</a>
+    <h2>Livres</h2>
+    <table border="1">
+        <tr><th>Titre</th><th>Auteur</th><th>ISBN</th></tr>
+        <tr th:each="livre : ${livres}">
+            <td th:text="${livre.titre}"></td>
+            <td th:text="${livre.auteur}"></td>
+            <td th:text="${livre.isbn}"></td>
+        </tr>
+    </table>
+    <h2>Adhérents</h2>
+    <table border="1">
+        <tr><th>Nom</th><th>Email</th><th>Âge</th></tr>
+        <tr th:each="adherent : ${adherents}">
+            <td th:text="${adherent.nom}"></td>
+            <td th:text="${adherent.email}"></td>
+            <td th:text="${adherent.age}"></td>
+        </tr>
+    </table>
 </body>
 </html>
