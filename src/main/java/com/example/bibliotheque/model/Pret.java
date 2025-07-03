@@ -13,14 +13,19 @@ public class Pret {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "adherent_id")
     private Adherent adherent;
+
     @ManyToOne
-    @JoinColumn(name = "exemplaire_id")
-    private Exemplaire exemplaire;
-    private String typePret; // sur place, à domicile
-    private LocalDate dateRetour;
-    private int nombreProlongements; // Nouvel attribut pour le quota de prolongement
-    private boolean prolonge;
+    @JoinColumn(name = "livre_id")
+    private Livre livre;
+
+    private LocalDate dateEmprunt;
+    private LocalDate dateRetourPrevus;
+    private LocalDate dateRetourEffectif;
+    private boolean penaliteActive;
+    private boolean prolonge; // Indique si le prêt peut être prolongé
+    private int nombreProlongements; // Nouveau champ pour le nombre de prolongations
 }

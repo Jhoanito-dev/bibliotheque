@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Réserver un livre</title></head>
+<body>
+    <h1>Réserver un livre</h1>
+    <form th:action="@{/bibliothecaire/reserver-livre}" th:object="${reservation}" method="post">
+        <div><label>Adhérent : <select th:field="*{adherent.id}">
+            <option th:each="adherent : ${adherents}" th:value="${adherent.id}" th:text="${adherent.nom}"></option>
+        </select></label></div>
+        <div><label>Livre : <select th:field="*{livre.id}">
+            <option th:each="livre : ${livres}" th:value="${livre.id}" th:text="${livre.titre}"></option>
+        </select></label></div>
+        <div><label>Date de retrait : <input type="date" name="dateRetrait" required /></label></div>
+        <div><input type="submit" value="Réserver" /></div>
+    </form>
+    <a th:href="@{/bibliothecaire/dashboard}">Retour</a>
+</body>
+</html>

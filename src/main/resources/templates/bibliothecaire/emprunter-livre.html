@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Emprunter un livre</title></head>
+<body>
+    <h1>Emprunter un livre</h1>
+    <form th:action="@{/bibliothecaire/emprunter-livre}" th:object="${pret}" method="post">
+        <div><label>Adhérent : <select th:field="*{adherent.id}">
+            <option th:each="adherent : ${adherents}" th:value="${adherent.id}" th:text="${adherent.nom}"></option>
+        </select></label></div>
+        <div><label>Livre : <select th:field="*{livre.id}">
+            <option th:each="livre : ${livres}" th:value="${livre.id}" th:text="${livre.titre}"></option>
+        </select></label></div>
+        <div><label>Type de prêt : 
+            <select name="typePret">
+                <option value="maison">À la maison</option>
+                <option value="surplace">Sur place</option>
+            </select>
+        </label></div>
+        <div><input type="submit" value="Emprunter" /></div>
+    </form>
+    <a th:href="@{/bibliothecaire/dashboard}">Retour</a>
+</body>
+</html>

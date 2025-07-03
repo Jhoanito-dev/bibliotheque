@@ -4,23 +4,51 @@
 <body>
     <h1>Tableau de bord Bibliothécaire</h1>
     <a th:href="@{/bibliothecaire/ajouter-livre}">Ajouter un livre</a> | 
-    <a th:href="@{/bibliothecaire/ajouter-adherent}">Ajouter un adhérent</a>
+    <a th:href="@{/bibliothecaire/ajouter-adherent}">Ajouter un adhérent</a> | 
+    <a th:href="@{/bibliothecaire/emprunter-livre}">Emprunter un livre</a> | 
+    <a th:href="@{/bibliothecaire/reserver-livre}">Réserver un livre</a>
     <h2>Livres</h2>
     <table border="1">
-        <tr><th>Titre</th><th>Auteur</th><th>ISBN</th></tr>
+        <tr><th>Titre</th><th>Auteur</th><th>ISBN</th><th>Exemplaires</th><th>Âge minimum</th><th>Disponible</th></tr>
         <tr th:each="livre : ${livres}">
             <td th:text="${livre.titre}"></td>
             <td th:text="${livre.auteur}"></td>
             <td th:text="${livre.isbn}"></td>
+            <td th:text="${livre.nombreExemplaires}"></td>
+            <td th:text="${livre.ageMinimum}"></td>
+            <td th:text="${livre.disponible} ? 'Oui' : 'Non'"></td>
         </tr>
     </table>
     <h2>Adhérents</h2>
     <table border="1">
-        <tr><th>Nom</th><th>Email</th><th>Âge</th></tr>
+        <tr><th>Nom</th><th>Email</th><th>Âge</th><th>Pénalité</th></tr>
         <tr th:each="adherent : ${adherents}">
             <td th:text="${adherent.nom}"></td>
             <td th:text="${adherent.email}"></td>
             <td th:text="${adherent.age}"></td>
+            <td th:text="${adherent.penaliteJusquAu}"></td>
+        </tr>
+    </table>
+    <h2>Prêts en cours</h2>
+<table border="1">
+    <tr><th>Adhérent</th><th>Livre</th><th>Date emprunt</th><th>Date retour prévue</th><th>Nombre prolongements</th><th>Retourner</th></tr>
+    <tr th:each="pret : ${prets}">
+        <td th:text="${pret.adherent.nom}"></td>
+        <td th:text="${pret.livre.titre}"></td>
+        <td th:text="${pret.dateEmprunt}"></td>
+        <td th:text="${pret.dateRetourPrevus}"></td>
+        <td th:text="${pret.nombreProlongements}"></td>
+        <td><a th:href="@{/bibliothecaire/retourner-livre/{id}(id=${pret.id})}">Retourner</a></td>
+    </tr>
+</table>
+    <h2>Réservations</h2>
+    <table border="1">
+        <tr><th>Adhérent</th><th>Livre</th><th>Date reservation</th><th>Date limite retrait</th></tr>
+        <tr th:each="reservation : ${reservations}">
+            <td th:text="${reservation.adherent.nom}"></td>
+            <td th:text="${reservation.livre.titre}"></td>
+            <td th:text="${reservation.dateReservation}"></td>
+            <td th:text="${reservation.dateLimiteRetrait}"></td>
         </tr>
     </table>
 </body>
