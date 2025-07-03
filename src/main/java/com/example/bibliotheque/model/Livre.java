@@ -19,5 +19,6 @@ public class Livre {
     private String isbn;
     private String categorie;
     private int nombreExemplaires;
-    private int ageMinimum; // Nouvel attribut pour restriction 18+
+    private int ageMinimum;
+    private boolean disponible; // Nouvelle colonne pour indiquer la disponibilité
 }
