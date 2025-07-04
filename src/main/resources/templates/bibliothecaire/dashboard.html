@@ -1,61 +1,162 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Tableau de bord Bibliothécaire</title></head>
+<head>
+    <title>Tableau de bord Bibliothécaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
 <body>
-    <h1>Tableau de bord Bibliothécaire</h1>
-    <a th:href="@{/bibliothecaire/ajouter-livre}">Ajouter un livre</a> | 
-    <a th:href="@{/bibliothecaire/ajouter-adherent}">Ajouter un adhérent</a> | 
-    <a th:href="@{/bibliothecaire/emprunter-livre}">Emprunter un livre</a> | 
-    <a th:href="@{/bibliothecaire/reserver-livre}">Réserver un livre</a>
-    <h2>Livres</h2>
-    <table border="1">
-        <tr><th>Titre</th><th>Auteur</th><th>ISBN</th><th>Exemplaires</th><th>Âge minimum</th><th>Disponible</th></tr>
-        <tr th:each="livre : ${livres}">
-            <td th:text="${livre.titre}"></td>
-            <td th:text="${livre.auteur}"></td>
-            <td th:text="${livre.isbn}"></td>
-            <td th:text="${livre.nombreExemplaires}"></td>
-            <td th:text="${livre.ageMinimum}"></td>
-            <td th:text="${livre.disponible} ? 'Oui' : 'Non'"></td>
-        </tr>
-    </table>
-    <h2>Adhérents</h2>
-    <table border="1">
-        <tr><th>Nom</th><th>Email</th><th>Âge</th><th>Catégorie</th><th>Quota Prêt</th><th>Quota Réservation</th><th>Quota Prolongement</th><th>Pénalité</th></tr>
-        <tr th:each="adherent : ${adherents}">
-            <td th:text="${adherent.nom}"></td>
-            <td th:text="${adherent.email}"></td>
-            <td th:text="${adherent.age}"></td>
-            <td th:text="${adherent.categorie}"></td>
-            <td th:text="${adherent.quotaPret}"></td>
-            <td th:text="${adherent.quotaReservation}"></td>
-            <td th:text="${adherent.quotaProlongement}"></td>
-            <td th:text="${adherent.penaliteJusquAu}"></td>
-        </tr>
-    </table>
-    <h2>Prêts en cours</h2>
-    <table border="1">
-        <tr><th>Adhérent</th><th>Livre</th><th>Date emprunt</th><th>Date retour prévue</th><th>Type</th><th>Prolongements</th><th>Prolonger</th><th>Retourner</th></tr>
-        <tr th:each="pret : ${prets}">
-            <td th:text="${pret.adherent.nom}"></td>
-            <td th:text="${pret.livre.titre}"></td>
-            <td th:text="${pret.dateEmprunt}"></td>
-            <td th:text="${pret.dateRetourPrevus}"></td>
-            <td th:text="${pret.typePret}"></td>
-            <td th:text="${pret.nombreProlongements}"></td>
-            <td><a th:href="@{/bibliothecaire/prolonger-pret/{id}(id=${pret.id})}" th:unless="${pret.prolonge or pret.nombreProlongements >= pret.adherent.quotaProlongement}">Prolonger</a></td>
-            <td><a th:href="@{/bibliothecaire/retourner-livre/{id}(id=${pret.id})}">Retourner</a></td>
-        </tr>
-    </table>
-    <h2>Réservations</h2>
-    <table border="1">
-        <tr><th>Adhérent</th><th>Livre</th><th>Date reservation</th><th>Date limite retrait</th></tr>
-        <tr th:each="reservation : ${reservations}">
-            <td th:text="${reservation.adherent.nom}"></td>
-            <td th:text="${reservation.livre.titre}"></td>
-            <td th:text="${reservation.dateReservation}"></td>
-            <td th:text="${reservation.dateLimiteRetrait}"></td>
-        </tr>
-    </table>
+    <div class="container">
+        <h1 class="my-4 text-center">Tableau de bord Bibliothécaire</h1>
+        
+        <div class="d-flex justify-content-center mb-4 flex-wrap">
+            <a th:href="@{/bibliothecaire/ajouter-livre}" class="btn btn-primary mx-2 mb-2">Ajouter un livre</a>
+            <a th:href="@{/bibliothecaire/ajouter-adherent}" class="btn btn-primary mx-2 mb-2">Ajouter un adhérent</a>
+            <a th:href="@{/bibliothecaire/emprunter-livre}" class="btn btn-primary mx-2 mb-2">Emprunter un livre</a>
+            <a th:href="@{/bibliothecaire/reserver-livre}" class="btn btn-primary mx-2 mb-2">Réserver un livre</a>
+        </div>
+
+        <!-- Section Livres -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h4 mb-0">Livres</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Auteur</th>
+                                <th>ISBN</th>
+                                <th>Exemplaires</th>
+                                <th>Âge minimum</th>
+                                <th>Disponible</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="livre : ${livres}">
+                                <td th:text="${livre.titre}"></td>
+                                <td th:text="${livre.auteur}"></td>
+                                <td th:text="${livre.isbn}"></td>
+                                <td th:text="${livre.nombreExemplaires}"></td>
+                                <td th:text="${livre.ageMinimum}"></td>
+                                <td>
+                                    <span th:if="${livre.disponible}" class="badge bg-success">Oui</span>
+                                    <span th:unless="${livre.disponible}" class="badge bg-danger">Non</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Adhérents -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h4 mb-0">Adhérents</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Âge</th>
+                                <th>Catégorie</th>
+                                <th>Quota Prêt</th>
+                                <th>Quota Réservation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="adherent : ${adherents}">
+                                <td th:text="${adherent.nom}"></td>
+                                <td th:text="${adherent.email}"></td>
+                                <td th:text="${adherent.age}"></td>
+                                <td th:text="${adherent.categorie}"></td>
+                                <td th:text="${adherent.quotaPret}"></td>
+                                <td th:text="${adherent.quotaReservation}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Prêts en cours -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h4 mb-0">Prêts en cours</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Adhérent</th>
+                                <th>Livre</th>
+                                <th>Date emprunt</th>
+                                <th>Date retour</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="pret : ${prets}">
+                                <td th:text="${pret.adherent.nom}"></td>
+                                <td th:text="${pret.livre.titre}"></td>
+                                <td th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
+                                <td>
+                                    <a th:href="@{/bibliothecaire/prolonger-pret/{id}(id=${pret.id})}" 
+                                       class="btn btn-sm btn-outline-primary me-1"
+                                       th:unless="${pret.prolonge or pret.nombreProlongements >= pret.adherent.quotaProlongement}">
+                                        Prolonger
+                                    </a>
+                                    <a th:href="@{/bibliothecaire/retourner-livre/{id}(id=${pret.id})}" 
+                                       class="btn btn-sm btn-outline-danger">
+                                        Retourner
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Réservations -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h4 mb-0">Réservations</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Adhérent</th>
+                                <th>Livre</th>
+                                <th>Date réservation</th>
+                                <th>Date limite</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="reservation : ${reservations}">
+                                <td th:text="${reservation.adherent.nom}"></td>
+                                <td th:text="${reservation.livre.titre}"></td>
+                                <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${#temporals.format(reservation.dateLimiteRetrait, 'dd/MM/yyyy')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.js"></script>
 </body>
 </html>

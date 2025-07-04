@@ -1,21 +1,43 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Ajouter un adhérent</title></head>
+<head>
+    <title>Ajouter un adhérent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
 <body>
-    <h1>Ajouter un adhérent</h1>
-    <form th:action="@{/bibliothecaire/ajouter-adherent}" th:object="${adherent}" method="post">
-        <div><label>Nom : <input th:field="*{nom}" /></label></div>
-        <div><label>Email : <input th:field="*{email}" /></label></div>
-        <div><label>Âge : <input type="number" th:field="*{age}" /></label></div>
-        <div><label>Catégorie : 
-            <select th:field="*{categorie}">
-                <option value="Etudiant">Etudiant</option>
-                <option value="Professeur">Professeur</option>
-                <option value="Autre">Autre</option>
-            </select>
-        </label></div>
-        <div><input type="submit" value="Ajouter" /></div>
-    </form>
-    <a th:href="@{/bibliothecaire/dashboard}">Retour</a>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h4">Ajouter un adhérent</h1>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/bibliothecaire/ajouter-adherent}" th:object="${adherent}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Nom :</label>
+                        <input type="text" th:field="*{nom}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email :</label>
+                        <input type="email" th:field="*{email}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Âge :</label>
+                        <input type="number" th:field="*{age}" class="form-control" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Catégorie :</label>
+                        <select th:field="*{categorie}" class="form-select" required>
+                            <option value="Etudiant">Étudiant</option>
+                            <option value="Professeur">Professeur</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <a th:href="@{/bibliothecaire/dashboard}" class="btn btn-secondary">Retour</a>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
