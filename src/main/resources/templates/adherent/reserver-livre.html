@@ -10,23 +10,20 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/bibliothecaire/dashboard">Bibliothèque</a>
+            <a class="navbar-brand" href="/adherent/dashboard">Bibliothèque</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/bibliothecaire/dashboard">Tableau de bord</a>
+                        <a class="nav-link" href="/adherent/dashboard">Tableau de bord</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/bibliothecaire/ajouter-livre">Ajouter un livre</a>
+                        <a class="nav-link active" aria-current="page" href="/adherent/reserver-livre">Réserver un livre</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/bibliothecaire/ajouter-adherent">Ajouter un adhérent</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/bibliothecaire/reserver-livre">Réserver un livre</a>
+                        <a class="nav-link" href="/adherent/emprunter-livre">Emprunter un livre</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">Déconnexion</a>
@@ -42,19 +39,15 @@
                 <h2 class="mb-0">Réserver un livre</h2>
             </div>
             <div class="card-body">
-                <form id="reserveBookForm" action="/bibliothecaire/reserver-livre" method="post">
-                    <div class="mb-3">
-                        <label for="adherent" class="form-label">Adhérent :</label>
-                        <select class="form-select" id="adherent" name="adherent" required>
-                            <option value="" disabled selected>Sélectionnez un adhérent</option>
-                            <!-- Dynamically populated via backend -->
-                        </select>
-                    </div>
+                <div class="mb-3">
+                    <p class="fw-bold">Bienvenue, <span th:text="${adherent.nom}"></span></p>
+                </div>
+                <form id="reserveBookForm" action="/adherent/reserver-livre" method="post">
                     <div class="mb-3">
                         <label for="livre" class="form-label">Livre :</label>
                         <select class="form-select" id="livre" name="livre" required>
-                            <option value="" disabled selected>Sélectionnez un livre</option>
-                            <!-- Dynamically populated via backend, disabled for unavailable books -->
+                            <option value="" disabled selected>-- Choisir un livre --</option>
+                            <!-- Dynamically populated via backend -->
                         </select>
                         <small class="text-muted">Les livres non disponibles sont grisés.</small>
                     </div>
@@ -63,8 +56,8 @@
                         <input type="date" class="form-control" id="dateRetrait" name="dateRetrait" required>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-primary">Réserver</button>
-                        <a href="/bibliothecaire/dashboard" class="btn btn-secondary">Retour</a>
+                        <button type="submit" class="btn btn-primary">Soumettre la demande</button>
+                        <a href="/adherent/dashboard" class="btn btn-secondary">Retour</a>
                     </div>
                 </form>
             </div>

@@ -1,30 +1,72 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="fr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de bord Bibliothécaire</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="my-4 text-center">Tableau de bord Bibliothécaire</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/bibliothecaire/dashboard">Bibliothèque</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/bibliothecaire/dashboard">Tableau de bord</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bibliothecaire/ajouter-livre">Ajouter un livre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bibliothecaire/ajouter-adherent">Ajouter un adhérent</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bibliothecaire/emprunter-livre">Emprunter un livre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bibliothecaire/reserver-livre">Réserver un livre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Déconnexion</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">Tableau de bord Bibliothécaire</h1>
         
-        <div class="d-flex justify-content-center mb-4 flex-wrap">
-            <a th:href="@{/bibliothecaire/ajouter-livre}" class="btn btn-primary mx-2 mb-2">Ajouter un livre</a>
-            <a th:href="@{/bibliothecaire/ajouter-adherent}" class="btn btn-primary mx-2 mb-2">Ajouter un adhérent</a>
-            <a th:href="@{/bibliothecaire/emprunter-livre}" class="btn btn-primary mx-2 mb-2">Emprunter un livre</a>
-            <a th:href="@{/bibliothecaire/reserver-livre}" class="btn btn-primary mx-2 mb-2">Réserver un livre</a>
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <a href="/bibliothecaire/ajouter-livre" class="btn btn-primary w-100 mb-2">Ajouter un livre</a>
+            </div>
+            <div class="col-md-3">
+                <a href="/bibliothecaire/ajouter-adherent" class="btn btn-primary w-100 mb-2">Ajouter un adhérent</a>
+            </div>
+            <div class="col-md-3">
+                <a href="/bibliothecaire/emprunter-livre" class="btn btn-primary w-100 mb-2">Emprunter un livre</a>
+            </div>
+            <div class="col-md-3">
+                <a href="/bibliothecaire/reserver-livre" class="btn btn-primary w-100 mb-2">Réserver un livre</a>
+            </div>
         </div>
 
-        <!-- Section Livres -->
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white">
-                <h2 class="h4 mb-0">Livres</h2>
+        <!-- Livres -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Livres</h2>
             </div>
             <div class="card-body">
+                <input type="text" id="searchLivres" class="form-control mb-3" placeholder="Rechercher un livre...">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
                                 <th>Titre</th>
                                 <th>Auteur</th>
@@ -34,33 +76,24 @@
                                 <th>Disponible</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="livre : ${livres}">
-                                <td th:text="${livre.titre}"></td>
-                                <td th:text="${livre.auteur}"></td>
-                                <td th:text="${livre.isbn}"></td>
-                                <td th:text="${livre.nombreExemplaires}"></td>
-                                <td th:text="${livre.ageMinimum}"></td>
-                                <td>
-                                    <span th:if="${livre.disponible}" class="badge bg-success">Oui</span>
-                                    <span th:unless="${livre.disponible}" class="badge bg-danger">Non</span>
-                                </td>
-                            </tr>
+                        <tbody id="livresTable">
+                            <!-- Dynamically populated via backend -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Section Adhérents -->
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white">
-                <h2 class="h4 mb-0">Adhérents</h2>
+        <!-- Adhérents -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Adhérents</h2>
             </div>
             <div class="card-body">
+                <input type="text" id="searchAdherents" class="form-control mb-3" placeholder="Rechercher un adhérent...">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
                                 <th>Nom</th>
                                 <th>Email</th>
@@ -70,30 +103,24 @@
                                 <th>Quota Réservation</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="adherent : ${adherents}">
-                                <td th:text="${adherent.nom}"></td>
-                                <td th:text="${adherent.email}"></td>
-                                <td th:text="${adherent.age}"></td>
-                                <td th:text="${adherent.categorie}"></td>
-                                <td th:text="${adherent.quotaPret}"></td>
-                                <td th:text="${adherent.quotaReservation}"></td>
-                            </tr>
+                        <tbody id="adherentsTable">
+                            <!-- Dynamically populated via backend -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Section Prêts en cours -->
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white">
-                <h2 class="h4 mb-0">Prêts en cours</h2>
+        <!-- Prêts en cours -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Prêts en cours</h2>
             </div>
             <div class="card-body">
+                <input type="text" id="searchPrets" class="form-control mb-3" placeholder="Rechercher un prêt...">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
                                 <th>Adhérent</th>
                                 <th>Livre</th>
@@ -102,22 +129,16 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="pret : ${prets}">
-                                <td th:text="${pret.adherent.nom}"></td>
-                                <td th:text="${pret.livre.titre}"></td>
-                                <td th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
-                                <td th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
+                        <tbody id="pretsTable">
+                            <!-- Dynamically populated via backend -->
+                            <tr>
+                                <td>Exemple</td>
+                                <td>Exemple Livre</td>
+                                <td>2025-07-01</td>
+                                <td>2025-07-15</td>
                                 <td>
-                                    <a th:href="@{/bibliothecaire/prolonger-pret/{id}(id=${pret.id})}" 
-                                       class="btn btn-sm btn-outline-primary me-1"
-                                       th:unless="${pret.prolonge or pret.nombreProlongements >= pret.adherent.quotaProlongement}">
-                                        Prolonger
-                                    </a>
-                                    <a th:href="@{/bibliothecaire/retourner-livre/{id}(id=${pret.id})}" 
-                                       class="btn btn-sm btn-outline-danger">
-                                        Retourner
-                                    </a>
+                                    <button class="btn btn-sm btn-outline-primary prolonger" data-bs-toggle="tooltip" title="Prolonger le prêt">Prolonger</button>
+                                    <button class="btn btn-sm btn-outline-danger retourner confirm-action" data-bs-toggle="tooltip" title="Retourner le livre">Retourner</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -126,15 +147,16 @@
             </div>
         </div>
 
-        <!-- Section Réservations -->
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white">
-                <h2 class="h4 mb-0">Réservations</h2>
+        <!-- Réservations -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Réservations</h2>
             </div>
             <div class="card-body">
+                <input type="text" id="searchReservations" class="form-control mb-3" placeholder="Rechercher une réservation...">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
                                 <th>Adhérent</th>
                                 <th>Livre</th>
@@ -142,12 +164,47 @@
                                 <th>Date limite</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="reservation : ${reservations}">
-                                <td th:text="${reservation.adherent.nom}"></td>
-                                <td th:text="${reservation.livre.titre}"></td>
-                                <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}"></td>
-                                <td th:text="${#temporals.format(reservation.dateLimiteRetrait, 'dd/MM/yyyy')}"></td>
+                        <tbody id="reservationsTable">
+                            <!-- Dynamically populated via backend -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demandes en attente -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Demandes en attente</h2>
+            </div>
+            <div class="card-body">
+                <input type="text" id="searchDemandes" class="form-control mb-3" placeholder="Rechercher une demande...">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Adhérent</th>
+                                <th>Livre</th>
+                                <th>Type</th>
+                                <th>Date soumission</th>
+                                <th>Date retrait</th>
+                                <th>Type prêt</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="demandesTable">
+                            <!-- Dynamically populated via backend -->
+                            <tr>
+                                <td>Exemple</td>
+                                <td>Exemple Livre</td>
+                                <td>Réservation</td>
+                                <td>2025-07-01</td>
+                                <td>2025-07-05</td>
+                                <td>À la maison</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success valider" data-bs-toggle="tooltip" title="Valider la demande">Valider</button>
+                                    <button class="btn btn-sm btn-outline-danger rejeter confirm-action" data-bs-toggle="tooltip" title="Rejeter la demande">Rejeter</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -156,7 +213,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/script.js"></script>
 </body>
 </html>
