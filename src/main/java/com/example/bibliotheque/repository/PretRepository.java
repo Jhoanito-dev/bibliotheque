@@ -1,13 +1,10 @@
 package com.example.bibliotheque.repository;
 
-import com.example.bibliotheque.model.Livre;
 import com.example.bibliotheque.model.Pret;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 public interface PretRepository extends JpaRepository<Pret, Long> {
-
-    List<Livre> findByAdherentIdAndDateRetourEffectifIsNull(Long id);
+    List<Pret> findByAdherentIdAndDateRetourEffectifIsNull(Long id);
 }
