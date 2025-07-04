@@ -2,30 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Emprunter un livre</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
-    <h1>Emprunter un livre</h1>
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-gradient">
+                <h1 class="h4 mb-0"><i class="bi bi-book"></i> EMPRUNTER UN LIVRE</h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-person-circle"></i> Bienvenue, <strong th:text="${adherent.nom}"></strong>
+                </div>
 
-    <div>
-        <p>Bienvenue, <span th:text="${adherent.nom}"></span></p>
+                <form th:action="@{/adherent/emprunt/submit}" method="post">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold"><i class="bi bi-book-half"></i> LIVRE :</label>
+                        <select id="livreId" name="livreId" class="form-select" required>
+                            <option value="">-- Choisir un livre --</option>
+                            <option th:each="livre : ${livres}" 
+                                    th:value="${livre.id}" 
+                                    th:text="${livre.titre}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold"><i class="bi bi-bookmark"></i> TYPE DE PRÊT :</label>
+                        <select id="typePret" name="typePret" class="form-select" required>
+                            <option value="surplace">Sur place</option>
+                            <option value="maison">À la maison</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send-check"></i> SOUMETTRE LA DEMANDE
+                        </button>
+                        <a th:href="@{/accueil}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> RETOUR
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <form th:action="@{/adherent/emprunt/submit}" method="post">
-        <label for="livreId">Livre :</label>
-        <select id="livreId" name="livreId">
-            <option value="">-- Choisir un livre --</option>
-            <option th:each="livre : ${livres}" th:value="${livre.id}" th:text="${livre.titre}"></option>
-        </select>
-
-        <label for="typePret">Type de prêt :</label>
-        <select id="typePret" name="typePret">
-            <option value="surplace">Sur place</option>
-            <option value="maison">À la maison</option>
-        </select>
-
-        <button type="submit">Soumettre la demande</button>
-        <a th:href="@{/accueil}">Retour</a>
-    </form>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'959e45635b34b3fd',t:'MTc1MTYyODQyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

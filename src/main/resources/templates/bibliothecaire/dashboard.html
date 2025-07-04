@@ -2,105 +2,200 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tableau de bord Bibliothécaire</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
-    <h1>Tableau de bord Bibliothécaire</h1>
+    <div class="container mt-5">
+        <div class="card mb-5">
+            <div class="card-header bg-gradient">
+                <h1 class="h3 mb-0"><i class="bi bi-speedometer2"></i> Tableau de bord Bibliothécaire</h1>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3 mb-5">
+                    <a th:href="@{/bibliothecaire/ajouter-livre}" class="btn btn-primary">
+                        <i class="bi bi-book-plus"></i> Ajouter un livre
+                    </a>
+                    <a th:href="@{/bibliothecaire/ajouter-adherent}" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Ajouter un adhérent
+                    </a>
+                    <a th:href="@{/bibliothecaire/emprunter-livre}" class="btn btn-primary">
+                        <i class="bi bi-book"></i> Emprunter un livre
+                    </a>
+                    <a th:href="@{/bibliothecaire/reserver-livre}" class="btn btn-primary">
+                        <i class="bi bi-bookmark-check"></i> Réserver un livre
+                    </a>
+                </div>
 
-    <div>
-        <a th:href="@{/bibliothecaire/ajouter-livre}">Ajouter un livre</a>
-        <a th:href="@{/bibliothecaire/ajouter-adherent}">Ajouter un adhérent</a>
-        <a th:href="@{/bibliothecaire/emprunter-livre}">Emprunter un livre</a>
-        <a th:href="@{/bibliothecaire/reserver-livre}">Réserver un livre</a>
-    </div>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="h4"><i class="bi bi-book"></i> Livres</h2>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Titre</th>
+                                    <th>Auteur</th>
+                                    <th>ISBN</th>
+                                    <th>Exemplaires</th>
+                                    <th>Âge minimum</th>
+                                    <th>Disponible</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="livre : ${livres}">
+                                    <td th:text="${livre.titre}"></td>
+                                    <td th:text="${livre.auteur}"></td>
+                                    <td th:text="${livre.isbn}"></td>
+                                    <td th:text="${livre.nombreExemplaires}"></td>
+                                    <td th:text="${livre.ageMinimum}"></td>
+                                    <td>
+                                        <span th:class="${livre.disponible} ? 'badge bg-success' : 'badge bg-danger'" 
+                                              th:text="${livre.disponible} ? 'Oui' : 'Non'"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <div>
-        <h2>Livres</h2>
-        <table>
-            <tr>
-                <th>Titre</th><th>Auteur</th><th>ISBN</th><th>Exemplaires</th><th>Âge minimum</th><th>Disponible</th>
-            </tr>
-            <tr th:each="livre : ${livres}">
-                <td th:text="${livre.titre}"></td>
-                <td th:text="${livre.auteur}"></td>
-                <td th:text="${livre.isbn}"></td>
-                <td th:text="${livre.nombreExemplaires}"></td>
-                <td th:text="${livre.ageMinimum}"></td>
-                <td th:text="${livre.disponible ? 'Oui' : 'Non'}"></td>
-            </tr>
-        </table>
-    </div>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="h4"><i class="bi bi-people"></i> Adhérents</h2>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Âge</th>
+                                    <th>Catégorie</th>
+                                    <th>Quota Prêt</th>
+                                    <th>Quota Réservation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="adherent : ${adherents}">
+                                    <td th:text="${adherent.nom}"></td>
+                                    <td th:text="${adherent.email}"></td>
+                                    <td th:text="${adherent.age}"></td>
+                                    <td th:text="${adherent.categorie}"></td>
+                                    <td th:text="${adherent.quotaPret}"></td>
+                                    <td th:text="${adherent.quotaReservation}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <div>
-        <h2>Adhérents</h2>
-        <table>
-            <tr>
-                <th>Nom</th><th>Email</th><th>Âge</th><th>Catégorie</th><th>Quota Prêt</th><th>Quota Réservation</th>
-            </tr>
-            <tr th:each="adherent : ${adherents}">
-                <td th:text="${adherent.nom}"></td>
-                <td th:text="${adherent.email}"></td>
-                <td th:text="${adherent.age}"></td>
-                <td th:text="${adherent.categorie}"></td>
-                <td th:text="${adherent.quotaPret}"></td>
-                <td th:text="${adherent.quotaReservation}"></td>
-            </tr>
-        </table>
-    </div>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="h4"><i class="bi bi-clock-history"></i> Prêts en cours</h2>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Adhérent</th>
+                                    <th>Livre</th>
+                                    <th>Date emprunt</th>
+                                    <th>Date retour</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="pret : ${prets}">
+                                    <td th:text="${pret.adherent.nom}"></td>
+                                    <td th:text="${pret.livre.titre}"></td>
+                                    <td th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
+                                    <td th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
+                                    <td>
+                                        <a th:href="@{'/bibliothecaire/prolonger-pret/' + ${pret.id}}" class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="bi bi-calendar-plus"></i> Prolonger
+                                        </a>
+                                        <a th:href="@{'/bibliothecaire/retourner-livre/' + ${pret.id}}" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-arrow-return-left"></i> Retourner
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <div>
-        <h2>Prêts en cours</h2>
-        <table>
-            <tr>
-                <th>Adhérent</th><th>Livre</th><th>Date emprunt</th><th>Date retour</th><th>Actions</th>
-            </tr>
-            <tr th:each="pret : ${prets}">
-                <td th:text="${pret.adherent.nom}"></td>
-                <td th:text="${pret.livre.titre}"></td>
-                <td th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
-                <td th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
-                <td>
-                    <a th:href="@{'/bibliothecaire/prolonger-pret/' + ${pret.id}}">Prolonger</a>
-                    <a th:href="@{'/bibliothecaire/retourner-livre/' + ${pret.id}}">Retourner</a>
-                </td>
-            </tr>
-        </table>
-    </div>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="h4"><i class="bi bi-bookmark-check"></i> Réservations</h2>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Adhérent</th>
+                                    <th>Livre</th>
+                                    <th>Date réservation</th>
+                                    <th>Date limite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="reservation : ${reservations}">
+                                    <td th:text="${reservation.adherent.nom}"></td>
+                                    <td th:text="${reservation.livre.titre}"></td>
+                                    <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}"></td>
+                                    <td th:text="${#temporals.format(reservation.dateLimiteRetrait, 'dd/MM/yyyy')}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <div>
-        <h2>Réservations</h2>
-        <table>
-            <tr>
-                <th>Adhérent</th><th>Livre</th><th>Date réservation</th><th>Date limite</th>
-            </tr>
-            <tr th:each="reservation : ${reservations}">
-                <td th:text="${reservation.adherent.nom}"></td>
-                <td th:text="${reservation.livre.titre}"></td>
-                <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}"></td>
-                <td th:text="${#temporals.format(reservation.dateLimiteRetrait, 'dd/MM/yyyy')}"></td>
-            </tr>
-        </table>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="h4"><i class="bi bi-hourglass-split"></i> Demandes en attente</h2>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Adhérent</th>
+                                    <th>Livre</th>
+                                    <th>Type</th>
+                                    <th>Date soumission</th>
+                                    <th>Date retrait</th>
+                                    <th>Type prêt</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="demande : ${demandes}">
+                                    <td th:text="${demande.adherent.nom}"></td>
+                                    <td th:text="${demande.livre.titre}"></td>
+                                    <td th:text="${demande.typeDemande}"></td>
+                                    <td th:text="${#temporals.format(demande.dateSoumission, 'dd/MM/yyyy')}"></td>
+                                    <td th:text="${demande.dateRetraitSouhaitee != null ? #temporals.format(demande.dateRetraitSouhaitee, 'dd/MM/yyyy') : '-'}"></td>
+                                    <td th:text="${demande.typePret != null ? demande.typePret : '-'}"></td>
+                                    <td>
+                                        <a th:href="@{'/bibliothecaire/valider-demande/' + ${demande.id}}" class="btn btn-sm btn-outline-success me-2">
+                                            <i class="bi bi-check-circle"></i> Valider
+                                        </a>
+                                        <a th:href="@{'/bibliothecaire/rejeter-demande/' + ${demande.id}}" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-x-circle"></i> Rejeter
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div>
-        <h2>Demandes en attente</h2>
-        <table>
-            <tr>
-                <th>Adhérent</th><th>Livre</th><th>Type</th><th>Date soumission</th><th>Date retrait</th><th>Type prêt</th><th>Actions</th>
-            </tr>
-            <tr th:each="demande : ${demandes}">
-                <td th:text="${demande.adherent.nom}"></td>
-                <td th:text="${demande.livre.titre}"></td>
-                <td th:text="${demande.typeDemande}"></td>
-                <td th:text="${#temporals.format(demande.dateSoumission, 'dd/MM/yyyy')}"></td>
-                <td th:text="${demande.dateRetraitSouhaitee != null ? #temporals.format(demande.dateRetraitSouhaitee, 'dd/MM/yyyy') : '-'}"></td>
-                <td th:text="${demande.typePret != null ? demande.typePret : '-'}"></td>
-                <td>
-                    <a th:href="@{'/bibliothecaire/valider-demande/' + ${demande.id}}">Valider</a>
-                    <a th:href="@{'/bibliothecaire/rejeter-demande/' + ${demande.id}}">Rejeter</a>
-                </td>
-            </tr>
-        </table>
-    </div>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'959e42b88ca2b3fd',t:'MTc1MTYyODMxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
