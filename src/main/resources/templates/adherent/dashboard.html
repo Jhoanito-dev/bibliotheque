@@ -2,71 +2,132 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tableau de bord Adhérent</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
-    <h1>Tableau de bord Adhérent</h1>
+    <div class="container mt-4">
+        <div class="card mb-4">
+            <div class="card-header bg-gradient">
+                <h1 class="h3 mb-0"><i class="bi bi-person-circle"></i> TABLEAU DE BORD ADHÉRENT</h1>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h2 class="h5"><i class="bi bi-person-badge"></i> PROFIL</h2>
+                            </div>
+                            <div class="card-body">
+                                <p><strong><i class="bi bi-person"></i> Nom :</strong> <span th:text="${adherent.nom}"></span></p>
+                                <p><strong><i class="bi bi-envelope"></i> Email :</strong> <span th:text="${adherent.email}"></span></p>
+                                <p><strong><i class="bi bi-tag"></i> Catégorie :</strong> <span th:text="${adherent.categorie}"></span></p>
+                                <p><strong><i class="bi bi-calendar"></i> Âge :</strong> <span th:text="${adherent.age}"></span></p>
+                                <div th:if="${adherent.penaliteJusquAu != null}" class="alert alert-danger mt-3">
+                                    <i class="bi bi-exclamation-triangle"></i> <strong>PÉNALITÉ JUSQU'AU :</strong> 
+                                    <span th:text="${#temporals.format(adherent.penaliteJusquAu, 'dd/MM/yyyy')}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h2 class="h5"><i class="bi bi-lightning-charge"></i> ACTIONS RAPIDES</h2>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <a th:href="@{/adherent/emprunt}" class="btn btn-primary mb-3">
+                                    <i class="bi bi-book"></i> FAIRE UN EMPRUNT
+                                </a>
+                                <a th:href="@{/adherent/reservation}" class="btn btn-primary mb-3">
+                                    <i class="bi bi-bookmark-check"></i> FAIRE UNE RÉSERVATION
+                                </a>
+                                <div class="mt-auto">
+                                    <a th:href="@{/logout}" class="btn btn-outline-danger">
+                                        <i class="bi bi-box-arrow-right"></i> SE DÉCONNECTER
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <div>
-        <p>Bienvenue, <span th:text="${adherent.nom}"></span></p>
-        <p>Email : <span th:text="${adherent.email}"></span></p>
-        <p>Catégorie : <span th:text="${adherent.categorie}"></span></p>
-        <p>Âge : <span th:text="${adherent.age}"></span></p>
-        <p th:if="${adherent.penaliteJusquAu != null}">
-            Pénalité jusqu'au : <span th:text="${#temporals.format(adherent.penaliteJusquAu, 'dd/MM/yyyy')}"></span>
-        </p>
-    </div>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="h5"><i class="bi bi-clock-history"></i> PRÊTS EN COURS</h2>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:if="${prets == null or prets.isEmpty()}">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Aucun prêt en cours.
+                            </div>
+                        </th:block>
+                        <th:block th:unless="${prets == null or prets.isEmpty()}">
+                            <div class="table-container">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><i class="bi bi-book"></i> Livre</th>
+                                                <th><i class="bi bi-calendar-plus"></i> Date d'emprunt</th>
+                                                <th><i class="bi bi-calendar-check"></i> Date de retour</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="pret : ${prets}">
+                                                <td data-label="Livre" th:text="${pret.livre.titre}"></td>
+                                                <td data-label="Date emprunt" th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
+                                                <td data-label="Date retour" th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
 
-    <div>
-        <h2>Actions</h2>
-        <a th:href="@{/adherent/emprunt}">Faire un emprunt</a>
-        <a th:href="@{/adherent/reservation}">Faire une réservation</a>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="h5"><i class="bi bi-bookmark-star"></i> RÉSERVATIONS ACTIVES</h2>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:if="${reservations == null or reservations.isEmpty()}">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Aucune réservation active.
+                            </div>
+                        </th:block>
+                        <th:block th:unless="${reservations == null or reservations.isEmpty()}">
+                            <div class="table-container">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><i class="bi bi-book"></i> Livre</th>
+                                                <th><i class="bi bi-calendar-plus"></i> Date de réservation</th>
+                                                <th><i class="bi bi-hourglass"></i> Date limite</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="reservation : ${reservations}">
+                                                <td data-label="Livre" th:text="${reservation.livre.titre}"></td>
+                                                <td data-label="Date réservation" th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}"></td>
+                                                <td data-label="Date limite" th:text="${#temporals.format(reservation.dateLimiteRetrait, 'dd/MM/yyyy')}"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div>
-        <h2>Prêts en cours</h2>
-        <th:block th:if="${prets == null or prets.isEmpty()}">
-            <p>Aucun prêt en cours.</p>
-        </th:block>
-        <th:block th:unless="${prets == null or prets.isEmpty()}">
-            <table>
-                <tr>
-                    <th>Livre</th>
-                    <th>Date d'emprunt</th>
-                    <th>Date de retour prévu</th>
-                </tr>
-                <tr th:each="pret : ${prets}">
-                    <td th:text="${pret.livre.titre}"></td>
-                    <td th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
-                    <td th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
-                </tr>
-            </table>
-        </th:block>
-    </div>
-
-    <div>
-        <h2>Réservations actives</h2>
-        <th:block th:if="${reservations == null or reservations.isEmpty()}">
-            <p>Aucune réservation active.</p>
-        </th:block>
-        <th:block th:unless="${reservations == null or reservations.isEmpty()}">
-            <table>
-                <tr>
-                    <th>Livre</th>
-                    <th>Date de réservation</th>
-                    <th>Date limite de retrait</th>
-                </tr>
-                <tr th:each="reservation : ${reservations}">
-                    <td th:text="${reservation.livre.titre}"></td>
-                    <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}"></td>
-                    <td th:text="${#temporals.format(reservation.dateLimiteRetrait, 'dd/MM/yyyy')}"></td>
-                </tr>
-            </table>
-        </th:block>
-    </div>
-
-    <div>
-        <a th:href="@{/logout}">Se déconnecter</a>
-    </div>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'959e45b92b4bb3fd',t:'MTc1MTYyODQzNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
