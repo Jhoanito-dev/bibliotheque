@@ -1,162 +1,53 @@
-/* Custom styles for the library application with a noble aesthetic */
+/* Custom styles */
 body {
-    font-family: 'Merriweather', serif;
-    background: linear-gradient(135deg, #f8f1e9, #f5f5f5);
-    min-height: 100vh;
-    padding-top: 80px;
-    color: #2c2c2c;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    padding-top: 20px;
 }
 
-/* Override Bootstrap navbar */
-.navbar {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    background: #1b263b !important; /* Deep navy */
+.container {
+    max-width: 1200px;
 }
 
-.navbar-brand {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 1.6rem;
-    color: #e6b800 !important; /* Gold accent */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 20px;
 }
 
-.nav-link {
-    color: #f5f5f5 !important;
-    transition: color 0.3s ease;
+.card-header {
+    background-color: #343a40;
+    color: white;
+    font-weight: bold;
 }
 
-.nav-link:hover {
-    color: #e6b800 !important; /* Gold hover */
+.table th {
+    background-color: #343a40;
+    color: white;
 }
 
-/* Override Bootstrap buttons */
 .btn-primary {
-    background: #1b263b !important; /* Deep navy */
-    border-color: #1b263b !important;
-    color: #f5f5f5 !important;
-}
-
-.btn-primary:hover {
-    background: #e6b800 !important; /* Gold */
-    border-color: #e6b800 !important;
-    color: #1b263b !important;
+    background-color: #007bff;
+    border-color: #007bff;
 }
 
 .btn-secondary {
-    background: #6b7280 !important; /* Neutral gray */
-    border-color: #6b7280 !important;
-    color: #f5f5f5 !important;
-}
-
-.btn-secondary:hover {
-    background: #4b5563 !important;
-    border-color: #4b5563 !important;
-}
-
-/* Override card headers */
-.card-header {
-    background: #1b263b !important; /* Deep navy */
-    color: #f5f5f5 !important;
-    font-family: 'Cinzel', serif;
-    font-weight: 600;
-    border-bottom: none;
-    padding: 1.5rem;
-}
-
-/* Override table headers */
-.table th {
-    background: #2c2c2c !important; /* Charcoal */
-    color: #f5f5f5 !important;
-    font-family: 'Merriweather', serif;
-    font-weight: 700;
-    padding: 1rem;
-}
-
-/* General card and table styling */
-.card {
-    border: none;
-    border-radius: 10px;
-    background: #fffcf7 !important; /* Ivory */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-.table {
-    border-radius: 8px;
-    overflow: hidden;
-    background: #fffcf7 !important;
-}
-
-.table td {
-    vertical-align: middle;
-    padding: 0.75rem;
-    color: #2c2c2c;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #f0e7db !important; /* Light beige hover */
-}
-
-/* Form controls */
-.form-control, .form-select {
-    border-radius: 8px;
-    border: 1px solid #d1d5db !important;
-    background: #fffcf7 !important;
-    color: #2c2c2c;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: #e6b800 !important; /* Gold focus */
-    box-shadow: 0 0 0 0.2rem rgba(230, 184, 0, 0.25) !important;
+    background-color: #6c757d;
+    border-color: #6c757d;
 }
 
 .form-label {
-    font-family: 'Merriweather', serif;
     font-weight: 500;
-    color: #2c2c2c;
 }
 
-.form-check-input:checked {
-    background-color: #e6b800 !important; /* Gold */
-    border-color: #e6b800 !important;
+/* Navbar styling */
+.navbar {
+    margin-bottom: 20px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .navbar-nav {
-        text-align: center;
-    }
     .btn {
-        width: 100%;
-        margin-bottom: 0.5rem;
+        margin-bottom: 10px;
     }
-    .card {
-        margin-bottom: 1.5rem;
-    }
-    .table-responsive {
-        font-size: 0.9rem;
-    }
-}
-
-/* Animation for form validation */
-.was-validated .form-control:invalid, .was-validated .form-select:invalid {
-    animation: shake 0.3s;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-}
-
-/* Additional typography for headings */
-h1, h2, h3 {
-    font-family: 'Cinzel', serif;
-    color: #2c2c2c;
 }
