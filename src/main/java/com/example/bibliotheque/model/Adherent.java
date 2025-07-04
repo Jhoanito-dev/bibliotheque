@@ -15,6 +15,8 @@ public class Adherent {
     private Long id;
     private String nom;
     private String email;
+    private String motDePasse; // Nouveau champ pour le mot de passe haché
+    private String role; // Nouveau champ pour le rôle (USER ou ADMIN)
     private Integer age;
     private LocalDate penaliteJusquAu;
     private String categorie; // ex: "Etudiant", "Professeur", "Autre"
