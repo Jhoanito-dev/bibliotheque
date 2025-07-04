@@ -99,8 +99,13 @@ public class BibliothecaireController {
     @PostMapping("/bibliothecaire/emprunter-livre")
     public String emprunterLivre(@ModelAttribute Pret pret, @RequestParam String typePret, Model model) {
         try {
+                
             Adherent adherent = adherentRepository.findById(pret.getAdherent().getId()).orElseThrow();
             Livre livre = livreRepository.findById(pret.getLivre().getId()).orElseThrow();
+
+            if (adherent.getPenaliteJusquAu() != null && adherent.getPenaliteJusquAu().isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("L'adhérent est sous pénalité jusqu'au " + adherent.getPenaliteJusquAu());
+            }
 
             // Vérification de l'âge pour les livres 18+
             if (livre.getAgeMinimum() > 0 && (adherent.getAge() == null || adherent.getAge() < livre.getAgeMinimum())) {
@@ -178,6 +183,14 @@ public class BibliothecaireController {
     public String reserverLivre(@ModelAttribute Reservation reservation, @RequestParam LocalDate dateRetrait) {
         Adherent adherent = adherentRepository.findById(reservation.getAdherent().getId()).orElseThrow();
         Livre livre = livreRepository.findById(reservation.getLivre().getId()).orElseThrow();
+
+        if (dateRetrait.isBefore(LocalDate.now()) || dateRetrait.isEqual(LocalDate.now())) {
+            throw new IllegalArgumentException("La date de retrait doit être dans le futur.");
+        }
+
+        if (adherent.getPenaliteJusquAu() != null && adherent.getPenaliteJusquAu().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("L'adhérent est sous pénalité jusqu'au " + adherent.getPenaliteJusquAu());
+        }
 
         // Vérification de l'âge pour les livres 18+
         if (livre.getAgeMinimum() > 0 && (adherent.getAge() == null || adherent.getAge() < livre.getAgeMinimum())) {
