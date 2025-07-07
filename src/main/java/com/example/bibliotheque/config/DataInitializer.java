@@ -99,12 +99,13 @@ public class DataInitializer implements CommandLineRunner {
             bibliothecaire.setNom("Bibliothécaire");
             bibliothecaire.setEmail("bibliothecaire@example.com");
             bibliothecaire.setMotDePasse("admin123");
-            bibliothecaire.setRole("ROLE_ADMIN"); // Ajout du préfixe ROLE_
-            bibliothecaire.setAge(40);
-            bibliothecaire.setCategorie("Autre");
-            bibliothecaire.setQuotaPret(5);
-            bibliothecaire.setQuotaReservation(3);
-            bibliothecaire.setQuotaProlongement(2);
+            bibliothecaire.setRole("ROLE_ADMIN"); // Pas de ROLE_ ici pour simplifier
+            // Les champs suivants peuvent être null pour un admin
+            bibliothecaire.setAge(null);
+            bibliothecaire.setCategorie(null);
+            bibliothecaire.setQuotaPret(null);
+            bibliothecaire.setQuotaReservation(null);
+            bibliothecaire.setQuotaProlongement(null);
 
             adherentRepository.save(adherent1);
             adherentRepository.save(adherent2);

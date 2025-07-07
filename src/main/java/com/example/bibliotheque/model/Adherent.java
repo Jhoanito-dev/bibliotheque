@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,12 +16,27 @@ public class Adherent {
     private Long id;
     private String nom;
     private String email;
-    private String motDePasse; // Nouveau champ pour le mot de passe haché
-    private String role; // Nouveau champ pour le rôle (USER ou ADMIN)
+    private String motDePasse;
+    private String role; // USER ou ADMIN
+    
+    // Champs spécifiques aux adhérents (non utilisés pour les admins)
     private Integer age;
     private LocalDate penaliteJusquAu;
     private String categorie; // ex: "Etudiant", "Professeur", "Autre"
-    private int quotaPret; // Quota de prêts actifs
-    private int quotaReservation; // Quota de réservations actives
-    private int quotaProlongement; // Quota de prolongements autorisés
+    private Integer quotaPret; // Changé en Integer pour pouvoir être null
+    private Integer quotaReservation;
+    private Integer quotaProlongement;
+
+    // Relation OneToMany avec Pret
+    @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Pret> prets;
+
+    // Relation OneToMany avec Reservation
+    @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Reservation> reservations;
+
+    // Méthode pour vérifier si c'est un adhérent (et non un admin)
+    public boolean isAdherent() {
+        return "USER".equals(this.role);
+    }
 }
