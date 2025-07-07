@@ -106,6 +106,7 @@
                                     <th>Livre</th>
                                     <th>Date emprunt</th>
                                     <th>Date retour</th>
+                                    <th>Type</th> <!-- Nouvelle colonne ajoutée -->
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -116,7 +117,11 @@
                                     <td th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
                                     <td th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
                                     <td>
-                                        <a th:href="@{'/bibliothecaire/prolonger-pret/' + ${pret.id}}" class="btn btn-sm btn-outline-primary me-2">
+                                        <span th:if="${pret.typePret == 'surplace'}" class="badge bg-warning">Sur place</span>
+                                        <span th:if="${pret.typePret == 'maison'}" class="badge bg-success">À domicile</span>
+                                    </td>
+                                    <td>
+                                        <a th:if="${pret.typePret == 'maison'}" th:href="@{'/bibliothecaire/prolonger-pret/' + ${pret.id}}" class="btn btn-sm btn-outline-primary me-2">
                                             <i class="bi bi-calendar-plus"></i> Prolonger
                                         </a>
                                         <a th:href="@{'/bibliothecaire/retourner-livre/' + ${pret.id}}" class="btn btn-sm btn-outline-success">

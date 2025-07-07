@@ -1,57 +1,89 @@
-DROP TABLE IF EXISTS livre;
-CREATE TABLE livre (
-    id SERIAL PRIMARY KEY,
-    titre VARCHAR(255),
-    auteur VARCHAR(255),
-    isbn VARCHAR(17), 
-    categorie VARCHAR(100),
-    restrictions VARCHAR(100),
-    nombre_exemplaires INT
+-- Creating the bibliotheque database
+CREATE DATABASE bibliotheque;
+
+-- Connecting to the bibliotheque database
+\connect bibliotheque
+
+-- Creating the JourFerie table
+CREATE TABLE jour_ferie (
+    id BIGSERIAL PRIMARY KEY,
+    date DATE NOT NULL,
+    description VARCHAR(255)
 );
 
-DROP TABLE IF EXISTS exemplaire;
-CREATE TABLE exemplaire (
-    id SERIAL PRIMARY KEY,
-    numero_unique VARCHAR(20),
-    statut VARCHAR(50),
-    livre_id BIGINT,
+-- Creating the Livre table
+CREATE TABLE livre (
+    id BIGSERIAL PRIMARY KEY,
+    titre VARCHAR(255) NOT NULL,
+    auteur VARCHAR(255),
+    isbn VARCHAR(13),
+    categorie VARCHAR(100),
+    nombre_exemplaires INTEGER NOT NULL DEFAULT 0,
+    age_minimum INTEGER,
+    disponible BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+-- Creating the Adherent table
+CREATE TABLE adherent (
+    id BIGSERIAL PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mot_de_passe VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    age INTEGER,
+    penalite_jusqu_au DATE,
+    categorie VARCHAR(100),
+    quota_pret INTEGER NOT NULL DEFAULT 0,
+    quota_reservation INTEGER NOT NULL DEFAULT 0,
+    quota_prolongement INTEGER NOT NULL DEFAULT 0
+);
+
+-- Creating the Demande table
+CREATE TABLE demande (
+    id BIGSERIAL PRIMARY KEY,
+    adherent_id BIGINT NOT NULL,
+    livre_id BIGINT NOT NULL,
+    date_soumission DATE NOT NULL,
+    type_demande VARCHAR(50) NOT NULL,
+    date_retrait_souhaitee DATE,
+    statut VARCHAR(50) NOT NULL,
+    type_pret VARCHAR(50),
+    FOREIGN KEY (adherent_id) REFERENCES adherent(id),
     FOREIGN KEY (livre_id) REFERENCES livre(id)
 );
 
-DROP TABLE IF EXISTS adherent;
-CREATE TABLE adherent (
-    id SERIAL PRIMARY KEY,
-    nom VARCHAR(255),
-    email VARCHAR(255) UNIQUE,
-    type_profil VARCHAR(50),
-    cotisation_payee BOOLEAN,
-    date_expiration_cotisation DATE,
-    penalites VARCHAR(255)
+-- Creating the Reservation table
+CREATE TABLE reservation (
+    id BIGSERIAL PRIMARY KEY,
+    adherent_id BIGINT NOT NULL,
+    livre_id BIGINT NOT NULL,
+    date_reservation DATE NOT NULL,
+    date_limite_retrait DATE NOT NULL,
+    est_actif BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (adherent_id) REFERENCES adherent(id),
+    FOREIGN KEY (livre_id) REFERENCES livre(id)
 );
--- Insérer 5 livres
-INSERT INTO livre (titre, auteur, isbn, categorie, restrictions, nombre_exemplaires) VALUES
-('Le Petit Prince', 'Antoine de Saint-Exupéry', '978-2-07-061275-8', 'Littérature', NULL, 3),
-('1984', 'George Orwell', '978-0-451-52493-5', 'Science-fiction', 'Réservé aux +18', 2),
-('Harry Potter', 'J.K. Rowling', '978-0-747-53269-9', 'Fantasy', NULL, 4),
-('Les Misérables', 'Victor Hugo', '978-0-140-44430-5', 'Classique', NULL, 2),
-('Dune', 'Frank Herbert', '978-0-441-17271-9', 'Science-fiction', 'Professeurs uniquement', 1);
 
--- Insérer des exemplaires pour chaque livre
-INSERT INTO exemplaire (numero_unique, statut, livre_id) VALUES
-('LIVRE001-EX01', 'disponible', 1),
-('LIVRE001-EX02', 'disponible', 1),
-('LIVRE001-EX03', 'disponible', 1),
-('LIVRE002-EX01', 'disponible', 2),
-('LIVRE002-EX02', 'disponible', 2),
-('LIVRE003-EX01', 'disponible', 3),
-('LIVRE003-EX02', 'disponible', 3),
-('LIVRE003-EX03', 'disponible', 3),
-('LIVRE003-EX04', 'disponible', 3),
-('LIVRE004-EX01', 'disponible', 4),
-('LIVRE004-EX02', 'disponible', 4),
-('LIVRE005-EX01', 'disponible', 5);
+-- Creating the Pret table
+CREATE TABLE pret (
+    id BIGSERIAL PRIMARY KEY,
+    adherent_id BIGINT NOT NULL,
+    livre_id BIGINT NOT NULL,
+    date_emprunt DATE NOT NULL,
+    date_retour_effectif DATE,
+    date_retour_prevus DATE NOT NULL,
+    nombre_prolongements INTEGER NOT NULL DEFAULT 0,
+    penalite_active BOOLEAN NOT NULL DEFAULT FALSE,
+    prolonge BOOLEAN NOT NULL DEFAULT FALSE,
+    type_pret VARCHAR(50),
+    FOREIGN KEY (adherent_id) REFERENCES adherent(id),
+    FOREIGN KEY (livre_id) REFERENCES livre(id)
+);
 
--- Insérer 2 adhérents
-INSERT INTO adherent (nom, email, type_profil, cotisation_payee, date_expiration_cotisation, penalites) VALUES
-('nova', 'nova97pa@gmail.com', 'étudiant', true, '2025-12-31', NULL),
-('prof', 'prof@gmail.com', 'professeur', true, '2025-12-31', NULL);
+-- Adding indexes for better performance
+CREATE INDEX idx_demande_adherent_id ON demande(adherent_id);
+CREATE INDEX idx_demande_livre_id ON demande(livre_id);
+CREATE INDEX idx_reservation_adherent_id ON reservation(adherent_id);
+CREATE INDEX idx_reservation_livre_id ON reservation(livre_id);
+CREATE INDEX idx_pret_adherent_id ON pret(adherent_id);
+CREATE INDEX idx_pret_livre_id ON pret(livre_id);

@@ -1,104 +1,150 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Connexion</title>
+    <title>Connexion - Bibliothèque</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         .login-container {
             max-width: 400px;
-            margin: 100px auto;
-            padding: 30px;
-            border-radius: 10px;
-            background: rgba(15, 15, 25, 0.8);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 
-                        0 0 15px rgba(0, 240, 252, 0.2);
-            border: 1px solid rgba(0, 240, 252, 0.1);
-            animation: glow 2s infinite alternate;
+            margin: auto;
+            padding: 2.5rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
         
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 10px rgba(0, 240, 252, 0.2),
-                            0 4px 20px rgba(0, 0, 0, 0.3);
-            }
-            to {
-                box-shadow: 0 0 15px rgba(0, 240, 252, 0.4),
-                            0 4px 25px rgba(0, 0, 0, 0.4);
-            }
+        .login-container:hover {
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
         }
         
         body {
-            background-color: #0a0a12;
+            background-color: #f9f7f3;
             background-image: 
-                radial-gradient(circle at 25% 25%, rgba(9, 0, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(255, 0, 234, 0.1) 0%, transparent 50%);
+                linear-gradient(rgba(242, 245, 247, 0.9), rgba(242, 245, 247, 0.9)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="50" font-family="Arial" font-size="14" fill="%23d68c4510">📚</text></svg>');
             height: 100vh;
             display: flex;
             align-items: center;
+            padding: 20px;
         }
         
         .login-title {
-            color: #0ff0fc;
-            text-shadow: 0 0 5px rgba(0, 240, 252, 0.5);
-            margin-bottom: 20px;
+            color: #2c6e49;
+            margin-bottom: 1.5rem;
+            font-family: 'Merriweather', serif;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .login-title:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: #d68c45;
+            border-radius: 3px;
         }
         
         .login-subtitle {
-            color: #a0a0a0;
-            margin-bottom: 30px;
+            color: #4a5568;
+            margin-bottom: 2rem;
+            font-weight: 400;
         }
         
         .form-control {
-            background-color: rgba(10, 10, 20, 0.8);
-            border: 1px solid rgba(0, 240, 252, 0.3);
-            color: #e0e0e0;
+            background-color: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #2d3748;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1rem;
         }
         
         .form-control:focus {
-            background-color: rgba(15, 15, 25, 0.9);
-            border-color: #0ff0fc;
-            box-shadow: 0 0 0 0.25rem rgba(0, 240, 252, 0.25);
-            color: #e0e0e0;
-            animation: pulse 1.5s infinite;
+            background-color: white;
+            border-color: #4c956c;
+            box-shadow: 0 0 0 0.25rem rgba(76, 149, 108, 0.25);
+            color: #2d3748;
         }
         
         .form-label {
-            color: #0ff0fc;
-            font-weight: 500;
+            color: #2c6e49;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-login {
+            background-color: #2c6e49;
+            border: none;
+            padding: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            background-color: #4c956c;
+            transform: translateY(-2px);
+        }
+        
+        .alert-error {
+            background-color: rgba(229, 62, 62, 0.1) !important;
+            border-left: 4px solid #e53e3e !important;
+            color: #e53e3e !important;
+            border-radius: 8px;
+        }
+        
+        .library-icon {
+            font-size: 2.5rem;
+            color: #2c6e49;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="text-center mb-4">
-            <h2 class="login-title"><i class="bi bi-book"></i> Bibliothèque</h2>
-            <h3 class="login-subtitle h4">CONNEXION SYSTÈME</h3>
+            <div class="library-icon">
+                <i class="bi bi-book-half"></i>
+            </div>
+            <h2 class="login-title">Bibliothèque Universitaire</h2>
+            <h3 class="login-subtitle h4">Accès au système</h3>
         </div>
         
         <form th:action="@{/login}" method="post">
             <div class="mb-4">
-                <label class="form-label fw-bold"><i class="bi bi-person"></i> NOM D'UTILISATEUR :</label>
-                <input type="text" name="username" class="form-control form-control-lg" required>
+                <label class="form-label">
+                    <i class="bi bi-person-fill"></i> Identifiant :
+                </label>
+                <input type="text" name="username" class="form-control form-control-lg" required placeholder="Entrez votre nom d'utilisateur">
             </div>
             <div class="mb-4">
-                <label class="form-label fw-bold"><i class="bi bi-lock"></i> MOT DE PASSE :</label>
-                <input type="password" name="password" class="form-control form-control-lg" required>
+                <label class="form-label">
+                    <i class="bi bi-key-fill"></i> Mot de passe :
+                </label>
+                <input type="password" name="password" class="form-control form-control-lg" required placeholder="Entrez votre mot de passe">
             </div>
             <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-box-arrow-in-right"></i> SE CONNECTER
+                <button type="submit" class="btn btn-login btn-lg text-white">
+                    <i class="bi bi-box-arrow-in-right"></i> Se connecter
                 </button>
             </div>
         </form>
 
-        <div th:if="${param.error}" class="alert alert-danger mt-4" style="background-color: rgba(220, 53, 69, 0.2); border-color: #dc3545; color: #ff6b6b;">
-            <i class="bi bi-exclamation-triangle"></i> IDENTIFIANTS INVALIDES - ACCÈS REFUSÉ
+        <div th:if="${param.error}" class="alert alert-error mt-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> Identifiants incorrects - Veuillez réessayer
         </div>
     </div>
 

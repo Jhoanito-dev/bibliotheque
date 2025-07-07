@@ -46,8 +46,11 @@ public class BibliothecaireController {
     public String dashboard(Model model) {
         try {
             List<Livre> livres = livreRepository.findAll();
-            List<Adherent> adherents = adherentRepository.findAll();
-            List<Pret> prets = pretRepository.findAll();
+            // Filtrer pour n'avoir que les adhérents (ROLE_USER)
+            List<Adherent> adherents = adherentRepository.findAll().stream()
+                .filter(a -> "ROLE_USER".equals(a.getRole()))
+                .collect(Collectors.toList());
+            List<Pret> prets = pretRepository.findByDateRetourEffectifIsNull();
             List<Reservation> reservations = reservationRepository.findAll();
             List<Demande> demandes = demandeRepository.findByStatut("en attente");
 
@@ -89,7 +92,8 @@ public class BibliothecaireController {
     @PostMapping("/bibliothecaire/ajouter-adherent")
     public String ajouterAdherent(@ModelAttribute Adherent adherent) {
         adherent.setMotDePasse(passwordEncoder.encode(adherent.getMotDePasse()));
-        adherent.setRole("USER");
+        adherent.setRole("ROLE_USER"); // Toujours ROLE_USER pour les nouveaux adhérents
+        
         if ("Etudiant".equals(adherent.getCategorie())) {
             adherent.setQuotaPret(2);
             adherent.setQuotaReservation(1);
@@ -109,8 +113,13 @@ public class BibliothecaireController {
 
     @GetMapping("/bibliothecaire/emprunter-livre")
     public String emprunterLivreForm(Model model) {
+        // Ne montrer que les adhérents (ROLE_USER)
+        List<Adherent> adherents = adherentRepository.findAll().stream()
+            .filter(a -> "ROLE_USER".equals(a.getRole()))
+            .collect(Collectors.toList());
+        
         model.addAttribute("pret", new Pret());
-        model.addAttribute("adherents", adherentRepository.findAll());
+        model.addAttribute("adherents", adherents);
         model.addAttribute("livres", livreRepository.findAll());
         return "bibliothecaire/emprunter-livre";
     }
@@ -119,6 +128,12 @@ public class BibliothecaireController {
     public String emprunterLivre(@ModelAttribute Pret pret, @RequestParam String typePret, Model model) {
         try {
             Adherent adherent = adherentRepository.findById(pret.getAdherent().getId()).orElseThrow();
+            
+            // Vérifier que c'est bien un adhérent
+            if (!"ROLE_USER".equals(adherent.getRole())) {
+                throw new IllegalArgumentException("Seuls les adhérents peuvent emprunter des livres");
+            }
+
             Livre livre = livreRepository.findById(pret.getLivre().getId()).orElseThrow();
 
             if (adherent.getPenaliteJusquAu() != null && adherent.getPenaliteJusquAu().isAfter(LocalDate.now())) {
@@ -129,36 +144,45 @@ public class BibliothecaireController {
                 throw new IllegalArgumentException("L'adhérent doit avoir au moins " + livre.getAgeMinimum() + " ans pour ce livre.");
             }
 
-            long pretsActifs = pretRepository.findByAdherentIdAndDateRetourEffectifIsNull(adherent.getId()).size();
-            if (pretsActifs >= adherent.getQuotaPret() && !"surplace".equals(typePret)) {
-                throw new IllegalArgumentException("Quota de prêts atteint pour ce profil.");
-            }
-
-            if (!livre.isDisponible()) {
+            if (livre.getNombreExemplaires() <= 0) {
                 throw new IllegalArgumentException("Aucun exemplaire disponible pour ce livre.");
             }
 
             pret.setDateEmprunt(LocalDate.now());
             pret.setTypePret(typePret);
-            int dureeMax = "Etudiant".equals(adherent.getCategorie()) ? 14 : "Professeur".equals(adherent.getCategorie()) ? 30 : 21;
+            
+            int dureeMax;
+            if ("surplace".equals(typePret)) {
+                dureeMax = 1;
+            } else {
+                dureeMax = "Etudiant".equals(adherent.getCategorie()) ? 14 : 
+                          "Professeur".equals(adherent.getCategorie()) ? 30 : 21;
+                
+                long pretsActifs = pretRepository.findByAdherentIdAndDateRetourEffectifIsNull(adherent.getId()).size();
+                if (pretsActifs >= adherent.getQuotaPret()) {
+                    throw new IllegalArgumentException("Quota de prêts à domicile atteint pour ce profil.");
+                }
+            }
+
             pret.setDateRetourPrevus(calculerDateRetour(pret.getDateEmprunt(), dureeMax));
             pret.setPenaliteActive(false);
             pret.setProlonge(false);
             pret.setNombreProlongements(0);
 
-            if ("maison".equals(typePret) && livre.getNombreExemplaires() > 0) {
-                livre.setNombreExemplaires(livre.getNombreExemplaires() - 1);
-                livre.setDisponible(livre.getNombreExemplaires() > 0);
-            }
+            livre.setNombreExemplaires(livre.getNombreExemplaires() - 1);
+            livre.setDisponible(livre.getNombreExemplaires() > 0);
+            livreRepository.save(livre);
+
             pretRepository.save(pret);
-            if ("maison".equals(typePret)) {
-                livreRepository.save(livre);
-            }
             return "redirect:/bibliothecaire/dashboard";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de l'emprunt : " + e.getMessage());
             model.addAttribute("pret", pret);
-            model.addAttribute("adherents", adherentRepository.findAll());
+            // Ne montrer que les adhérents (ROLE_USER)
+            List<Adherent> adherents = adherentRepository.findAll().stream()
+                .filter(a -> "ROLE_USER".equals(a.getRole()))
+                .collect(Collectors.toList());
+            model.addAttribute("adherents", adherents);
             model.addAttribute("livres", livreRepository.findAll());
             return "bibliothecaire/emprunter-livre";
         }
@@ -169,17 +193,22 @@ public class BibliothecaireController {
         Pret pret = pretRepository.findById(id).orElseThrow();
         if (pret.getDateRetourEffectif() == null) {
             pret.setDateRetourEffectif(LocalDate.now());
-            if (pret.getDateRetourEffectif().isAfter(pret.getDateRetourPrevus())) {
+            
+            if (!"surplace".equals(pret.getTypePret()) && pret.getDateRetourEffectif().isAfter(pret.getDateRetourPrevus())) {
                 pret.setPenaliteActive(true);
-                pret.getAdherent().setPenaliteJusquAu(pret.getDateRetourEffectif().plusDays(10));
-                adherentRepository.save(pret.getAdherent());
+                Adherent adherent = pret.getAdherent();
+                // Vérifier que c'est bien un adhérent
+                if ("ROLE_USER".equals(adherent.getRole())) {
+                    adherent.setPenaliteJusquAu(pret.getDateRetourEffectif().plusDays(10));
+                    adherentRepository.save(adherent);
+                }
             }
+            
             Livre livre = pret.getLivre();
-            if ("maison".equals(pret.getTypePret())) {
-                livre.setNombreExemplaires(livre.getNombreExemplaires() + 1);
-                livre.setDisponible(livre.getNombreExemplaires() > 0);
-                livreRepository.save(livre);
-            }
+            livre.setNombreExemplaires(livre.getNombreExemplaires() + 1);
+            livre.setDisponible(livre.getNombreExemplaires() > 0);
+            livreRepository.save(livre);
+            
             pretRepository.save(pret);
         }
         return "redirect:/bibliothecaire/dashboard";
@@ -187,8 +216,13 @@ public class BibliothecaireController {
 
     @GetMapping("/bibliothecaire/reserver-livre")
     public String reserverLivreForm(Model model) {
+        // Ne montrer que les adhérents (ROLE_USER)
+        List<Adherent> adherents = adherentRepository.findAll().stream()
+            .filter(a -> "ROLE_USER".equals(a.getRole()))
+            .collect(Collectors.toList());
+        
         model.addAttribute("reservation", new Reservation());
-        model.addAttribute("adherents", adherentRepository.findAll());
+        model.addAttribute("adherents", adherents);
         model.addAttribute("livres", livreRepository.findAll());
         return "bibliothecaire/reserver-livre";
     }
@@ -197,6 +231,12 @@ public class BibliothecaireController {
     public String reserverLivre(@ModelAttribute Reservation reservation, @RequestParam LocalDate dateRetrait, Model model) {
         try {
             Adherent adherent = adherentRepository.findById(reservation.getAdherent().getId()).orElseThrow();
+            
+            // Vérifier que c'est bien un adhérent
+            if (!"ROLE_USER".equals(adherent.getRole())) {
+                throw new IllegalArgumentException("Seuls les adhérents peuvent réserver des livres");
+            }
+
             Livre livre = livreRepository.findById(reservation.getLivre().getId()).orElseThrow();
 
             if (dateRetrait.isBefore(LocalDate.now()) || dateRetrait.isEqual(LocalDate.now())) {
@@ -228,7 +268,11 @@ public class BibliothecaireController {
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la réservation : " + e.getMessage());
             model.addAttribute("reservation", reservation);
-            model.addAttribute("adherents", adherentRepository.findAll());
+            // Ne montrer que les adhérents (ROLE_USER)
+            List<Adherent> adherents = adherentRepository.findAll().stream()
+                .filter(a -> "ROLE_USER".equals(a.getRole()))
+                .collect(Collectors.toList());
+            model.addAttribute("adherents", adherents);
             model.addAttribute("livres", livreRepository.findAll());
             return "bibliothecaire/reserver-livre";
         }
@@ -238,6 +282,11 @@ public class BibliothecaireController {
     public String validerDemande(@PathVariable Long id, Model model) {
         Demande demande = demandeRepository.findById(id).orElseThrow();
         if ("en attente".equals(demande.getStatut())) {
+            // Vérifier que le demandeur est un adhérent
+            if (!"ROLE_USER".equals(demande.getAdherent().getRole())) {
+                throw new IllegalArgumentException("Seuls les adhérents peuvent faire des demandes");
+            }
+
             if ("pret".equals(demande.getTypeDemande())) {
                 Pret pret = new Pret();
                 pret.setAdherent(demande.getAdherent());
@@ -298,6 +347,11 @@ public class BibliothecaireController {
     public void verifierReservations() {
         List<Reservation> reservations = reservationRepository.findByEstActifTrueAndDateLimiteRetrait(LocalDate.now());
         for (Reservation reservation : reservations) {
+            // Vérifier que le réservataire est un adhérent
+            if (!"ROLE_USER".equals(reservation.getAdherent().getRole())) {
+                continue;
+            }
+
             Livre livre = reservation.getLivre();
             if (livre.isDisponible() && livre.getNombreExemplaires() > 0) {
                 Pret pret = new Pret();
@@ -326,6 +380,12 @@ public class BibliothecaireController {
         try {
             Pret pret = pretRepository.findById(id).orElseThrow();
             Adherent adherent = pret.getAdherent();
+            
+            // Vérifier que c'est bien un adhérent
+            if (!"ROLE_USER".equals(adherent.getRole())) {
+                throw new IllegalArgumentException("Seuls les adhérents peuvent prolonger des prêts");
+            }
+
             if (pret.getNombreProlongements() < adherent.getQuotaProlongement() && !pret.isProlonge()) {
                 int dureeAjout = "Etudiant".equals(adherent.getCategorie()) ? 7 : "Professeur".equals(adherent.getCategorie()) ? 14 : 10;
                 pret.setDateRetourPrevus(calculerDateRetour(pret.getDateRetourPrevus(), dureeAjout));
