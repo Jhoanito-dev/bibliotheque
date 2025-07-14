@@ -13,9 +13,33 @@
     <div class="container mt-5">
         <div class="card mb-5">
             <div class="card-header bg-gradient">
-                <h1 class="h3 mb-0"><i class="bi bi-speedometer2"></i> Tableau de bord Bibliothécaire</h1>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0"><i class="bi bi-speedometer2"></i> Tableau de bord Bibliothécaire</h1>
+                    <a href="/logout" class="btn btn-outline-light">
+                        <i class="bi bi-box-arrow-right"></i> Se déconnecter
+                    </a>
+                </div>
             </div>
             <div class="card-body">
+                <!-- Affichage des erreurs -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- Affichage des succès -->
+                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <strong th:if="${param.success == 'emprunt'}">✅ Emprunt réussi :</strong>
+                    <strong th:if="${param.success == 'reservation'}">✅ Réservation réussie :</strong>
+                    <strong th:if="${param.success == 'prolongation'}">✅ Prolongation réussie :</strong>
+                    <span th:if="${param.success == 'emprunt'}">Le livre "<span th:text="${param.livre}"></span>" a été emprunté par <span th:text="${param.adherent}"></span>.</span>
+                    <span th:if="${param.success == 'reservation'}">Le livre "<span th:text="${param.livre}"></span>" a été réservé par <span th:text="${param.adherent}"></span>.</span>
+                    <span th:if="${param.success == 'prolongation'}">Le prêt du livre "<span th:text="${param.livre}"></span>" a été prolongé pour <span th:text="${param.adherent}"></span>.</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
                 <div class="d-flex flex-wrap gap-3 mb-5">
                     <a th:href="@{/bibliothecaire/ajouter-livre}" class="btn btn-primary">
                         <i class="bi bi-book-plus"></i> Ajouter un livre
@@ -48,6 +72,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr th:if="${#lists.isEmpty(livres)}">
+                                    <td colspan="6" class="text-center text-muted">
+                                        <i class="bi bi-info-circle"></i> Aucun livre trouvé
+                                    </td>
+                                </tr>
                                 <tr th:each="livre : ${livres}">
                                     <td th:text="${livre.titre}"></td>
                                     <td th:text="${livre.auteur}"></td>
@@ -81,6 +110,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr th:if="${#lists.isEmpty(adherents)}">
+                                    <td colspan="6" class="text-center text-muted">
+                                        <i class="bi bi-info-circle"></i> Aucun adhérent trouvé
+                                    </td>
+                                </tr>
                                 <tr th:each="adherent : ${adherents}">
                                     <td th:text="${adherent.nom}"></td>
                                     <td th:text="${adherent.email}"></td>
@@ -111,6 +145,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr th:if="${#lists.isEmpty(prets)}">
+                                    <td colspan="6" class="text-center text-muted">
+                                        <i class="bi bi-info-circle"></i> Aucun prêt en cours
+                                    </td>
+                                </tr>
                                 <tr th:each="pret : ${prets}">
                                     <td th:text="${pret.adherent.nom}"></td>
                                     <td th:text="${pret.livre.titre}"></td>
@@ -149,6 +188,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr th:if="${#lists.isEmpty(reservations)}">
+                                    <td colspan="4" class="text-center text-muted">
+                                        <i class="bi bi-info-circle"></i> Aucune réservation trouvée
+                                    </td>
+                                </tr>
                                 <tr th:each="reservation : ${reservations}">
                                     <td th:text="${reservation.adherent.nom}"></td>
                                     <td th:text="${reservation.livre.titre}"></td>
@@ -178,6 +222,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr th:if="${#lists.isEmpty(demandes)}">
+                                    <td colspan="7" class="text-center text-muted">
+                                        <i class="bi bi-info-circle"></i> Aucune demande en attente
+                                    </td>
+                                </tr>
                                 <tr th:each="demande : ${demandes}">
                                     <td th:text="${demande.adherent.nom}"></td>
                                     <td th:text="${demande.livre.titre}"></td>

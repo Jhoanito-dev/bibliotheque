@@ -16,6 +16,14 @@
                 <h1 class="h4 mb-0"><i class="bi bi-book"></i> Emprunter un livre</h1>
             </div>
             <div class="card-body">
+                <!-- Affichage des erreurs -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Erreur lors de l'emprunt :</strong>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
                 <form th:action="@{/bibliothecaire/emprunter-livre}" th:object="${pret}" method="post">
                     <div class="mb-3">
                         <label class="form-label fw-bold"><i class="bi bi-person"></i> Adhérent :</label>
@@ -23,9 +31,10 @@
                             <option value="">Sélectionnez un adhérent</option>
                             <option th:each="adherent : ${adherents}" 
                                     th:value="${adherent.id}" 
-                                    th:text="${adherent.nom + ' (' + adherent.email + ')'}">
+                                    th:text="${adherent.nom + ' (' + adherent.email + ') - ' + adherent.categorie + ' - Quota: ' + adherent.quotaPret + ' prêt(s)'}">
                             </option>
                         </select>
+                        <small class="text-muted">Les quotas de prêt sont affichés pour chaque adhérent</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold"><i class="bi bi-book-half"></i> Livre :</label>
@@ -33,9 +42,11 @@
                             <option value="">Sélectionnez un livre</option>
                             <option th:each="livre : ${livres}" 
                                     th:value="${livre.id}" 
-                                    th:text="${livre.titre + ' - ' + livre.auteur}">
+                                    th:text="${livre.titre + ' - ' + livre.auteur + ' (' + livre.nombreExemplaires + ' exemplaire(s))'}"
+                                    th:disabled="${livre.nombreExemplaires <= 0}">
                             </option>
                         </select>
+                        <small class="text-muted">Les livres sans exemplaires disponibles sont grisés</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold"><i class="bi bi-bookmark"></i> Type de prêt :</label>

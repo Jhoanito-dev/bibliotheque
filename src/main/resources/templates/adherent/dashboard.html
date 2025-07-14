@@ -16,6 +16,22 @@
                 <h1 class="h3 mb-0"><i class="bi bi-person-circle"></i> TABLEAU DE BORD ADHÉRENT</h1>
             </div>
             <div class="card-body">
+                <!-- Affichage des messages d'erreur -->
+                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Erreur :</strong>
+                    <span th:text="${param.error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Affichage des messages de succès -->
+                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <strong>Succès :</strong>
+                    <span th:text="${param.success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="card h-100">
