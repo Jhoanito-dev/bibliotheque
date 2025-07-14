@@ -44,9 +44,18 @@ public class AccueilController {
             model.addAttribute("adherent", adherent);
             model.addAttribute("prets", prets);
 
-            if (auth.getAuthorities().toString().contains("ADMIN")) {
-                return "bibliothecaire/dashboard";
+            // Debug: afficher les autorités
+            System.out.println("=== REDIRECTION APRÈS CONNEXION ===");
+            System.out.println("Utilisateur : " + email);
+            System.out.println("Autorités : " + auth.getAuthorities());
+            System.out.println("Rôle de l'adhérent : " + adherent.getRole());
+            
+            // Vérifier le rôle de l'adhérent plutôt que les autorités
+            if ("ROLE_ADMIN".equals(adherent.getRole())) {
+                System.out.println("Redirection vers dashboard bibliothécaire");
+                return "redirect:/bibliothecaire/dashboard";
             } else {
+                System.out.println("Redirection vers dashboard adhérent");
                 return "adherent/dashboard";
             }
         }

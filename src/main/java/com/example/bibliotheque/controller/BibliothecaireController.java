@@ -45,21 +45,57 @@ public class BibliothecaireController {
     @Transactional(readOnly = true)
     public String dashboard(Model model) {
         try {
+            System.out.println("=== CHARGEMENT DU DASHBOARD BIBLIOTHÉCAIRE ===");
+            
+            // Test direct de la base de données
+            long totalLivres = livreRepository.count();
+            long totalAdherents = adherentRepository.count();
+            long totalPrets = pretRepository.count();
+            long totalReservations = reservationRepository.count();
+            long totalDemandes = demandeRepository.count();
+            
+            System.out.println("Compteurs de base :");
+            System.out.println("- Total livres : " + totalLivres);
+            System.out.println("- Total adhérents : " + totalAdherents);
+            System.out.println("- Total prêts : " + totalPrets);
+            System.out.println("- Total réservations : " + totalReservations);
+            System.out.println("- Total demandes : " + totalDemandes);
+            
             List<Livre> livres = livreRepository.findAll();
+            System.out.println("Livres trouvés : " + (livres != null ? livres.size() : 0));
+            if (livres != null && !livres.isEmpty()) {
+                System.out.println("Premier livre : " + livres.get(0).getTitre());
+            }
+            
             // Filtrer pour n'avoir que les adhérents (ROLE_USER)
             List<Adherent> adherents = adherentRepository.findAll().stream()
                 .filter(a -> "ROLE_USER".equals(a.getRole()))
                 .collect(Collectors.toList());
+            System.out.println("Adhérents trouvés : " + (adherents != null ? adherents.size() : 0));
+            if (adherents != null && !adherents.isEmpty()) {
+                System.out.println("Premier adhérent : " + adherents.get(0).getNom());
+            }
+            
             List<Pret> prets = pretRepository.findByDateRetourEffectifIsNull();
+            System.out.println("Prêts actifs trouvés : " + (prets != null ? prets.size() : 0));
+            
             List<Reservation> reservations = reservationRepository.findAll();
+            System.out.println("Réservations trouvées : " + (reservations != null ? reservations.size() : 0));
+            
             List<Demande> demandes = demandeRepository.findByStatut("en attente");
+            System.out.println("Demandes en attente trouvées : " + (demandes != null ? demandes.size() : 0));
 
             model.addAttribute("livres", livres != null ? livres : Collections.emptyList());
             model.addAttribute("adherents", adherents != null ? adherents : Collections.emptyList());
             model.addAttribute("prets", prets != null ? prets : Collections.emptyList());
             model.addAttribute("reservations", reservations != null ? reservations : Collections.emptyList());
             model.addAttribute("demandes", demandes != null ? demandes : Collections.emptyList());
+            
+            System.out.println("=== DASHBOARD CHARGÉ AVEC SUCCÈS ===");
         } catch (Exception e) {
+            System.err.println("=== ERREUR LORS DU CHARGEMENT DU DASHBOARD ===");
+            System.err.println("Erreur : " + e.getMessage());
+            e.printStackTrace();
             model.addAttribute("livres", Collections.emptyList());
             model.addAttribute("adherents", Collections.emptyList());
             model.addAttribute("prets", Collections.emptyList());
@@ -137,15 +173,20 @@ public class BibliothecaireController {
             Livre livre = livreRepository.findById(pret.getLivre().getId()).orElseThrow();
 
             if (adherent.getPenaliteJusquAu() != null && adherent.getPenaliteJusquAu().isAfter(LocalDate.now())) {
-                throw new IllegalArgumentException("L'adhérent est sous pénalité jusqu'au " + adherent.getPenaliteJusquAu());
+                throw new IllegalArgumentException("❌ L'adhérent " + adherent.getNom() + " est sous pénalité jusqu'au " + 
+                    adherent.getPenaliteJusquAu().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) + 
+                    ". Impossible d'emprunter pendant cette période.");
             }
 
             if (livre.getAgeMinimum() > 0 && (adherent.getAge() == null || adherent.getAge() < livre.getAgeMinimum())) {
-                throw new IllegalArgumentException("L'adhérent doit avoir au moins " + livre.getAgeMinimum() + " ans pour ce livre.");
+                throw new IllegalArgumentException("❌ Âge insuffisant : L'adhérent " + adherent.getNom() + " a " + 
+                    (adherent.getAge() != null ? adherent.getAge() : "âge non renseigné") + " ans, mais ce livre nécessite au moins " + 
+                    livre.getAgeMinimum() + " ans. Titre du livre : " + livre.getTitre());
             }
 
             if (livre.getNombreExemplaires() <= 0) {
-                throw new IllegalArgumentException("Aucun exemplaire disponible pour ce livre.");
+                throw new IllegalArgumentException("❌ Aucun exemplaire disponible : Le livre '" + livre.getTitre() + 
+                    "' n'a plus d'exemplaires disponibles. Veuillez attendre qu'un exemplaire soit retourné.");
             }
 
             pret.setDateEmprunt(LocalDate.now());
@@ -160,7 +201,9 @@ public class BibliothecaireController {
                 
                 long pretsActifs = pretRepository.findByAdherentIdAndDateRetourEffectifIsNull(adherent.getId()).size();
                 if (pretsActifs >= adherent.getQuotaPret()) {
-                    throw new IllegalArgumentException("Quota de prêts à domicile atteint pour ce profil.");
+                    throw new IllegalArgumentException("❌ Quota de prêts atteint : L'adhérent " + adherent.getNom() + 
+                        " a déjà " + pretsActifs + " prêt(s) actif(s) sur " + adherent.getQuotaPret() + " autorisé(s). " +
+                        "Veuillez attendre le retour d'un livre avant d'en emprunter un autre.");
                 }
             }
 
@@ -174,7 +217,7 @@ public class BibliothecaireController {
             livreRepository.save(livre);
 
             pretRepository.save(pret);
-            return "redirect:/bibliothecaire/dashboard";
+            return "redirect:/bibliothecaire/dashboard?success=emprunt&livre=" + livre.getTitre() + "&adherent=" + adherent.getNom();
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de l'emprunt : " + e.getMessage());
             model.addAttribute("pret", pret);
@@ -240,31 +283,39 @@ public class BibliothecaireController {
             Livre livre = livreRepository.findById(reservation.getLivre().getId()).orElseThrow();
 
             if (dateRetrait.isBefore(LocalDate.now()) || dateRetrait.isEqual(LocalDate.now())) {
-                throw new IllegalArgumentException("La date de retrait doit être dans le futur.");
+                throw new IllegalArgumentException("❌ Date invalide : La date de retrait doit être dans le futur. " +
+                    "Date sélectionnée : " + dateRetrait.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             }
 
             if (adherent.getPenaliteJusquAu() != null && adherent.getPenaliteJusquAu().isAfter(LocalDate.now())) {
-                throw new IllegalArgumentException("L'adhérent est sous pénalité jusqu'au " + adherent.getPenaliteJusquAu());
+                throw new IllegalArgumentException("❌ L'adhérent " + adherent.getNom() + " est sous pénalité jusqu'au " + 
+                    adherent.getPenaliteJusquAu().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) + 
+                    ". Impossible de réserver pendant cette période.");
             }
 
             if (livre.getAgeMinimum() > 0 && (adherent.getAge() == null || adherent.getAge() < livre.getAgeMinimum())) {
-                throw new IllegalArgumentException("L'adhérent doit avoir au moins " + livre.getAgeMinimum() + " ans pour ce livre.");
+                throw new IllegalArgumentException("❌ Âge insuffisant : L'adhérent " + adherent.getNom() + " a " + 
+                    (adherent.getAge() != null ? adherent.getAge() : "âge non renseigné") + " ans, mais ce livre nécessite au moins " + 
+                    livre.getAgeMinimum() + " ans. Titre du livre : " + livre.getTitre());
             }
 
             long reservationsActives = reservationRepository.findByAdherentIdAndEstActifTrue(adherent.getId()).size();
             if (reservationsActives >= adherent.getQuotaReservation()) {
-                throw new IllegalArgumentException("Quota de réservations atteint pour ce profil.");
+                throw new IllegalArgumentException("❌ Quota de réservations atteint : L'adhérent " + adherent.getNom() + 
+                    " a déjà " + reservationsActives + " réservation(s) active(s) sur " + adherent.getQuotaReservation() + " autorisée(s). " +
+                    "Veuillez attendre qu'une réservation soit traitée avant d'en faire une nouvelle.");
             }
 
             if (!livre.isDisponible()) {
-                throw new IllegalArgumentException("Aucun exemplaire disponible pour ce livre.");
+                throw new IllegalArgumentException("❌ Livre non disponible : Le livre '" + livre.getTitre() + 
+                    "' n'a plus d'exemplaires disponibles. Veuillez attendre qu'un exemplaire soit retourné.");
             }
 
             reservation.setDateReservation(LocalDate.now());
             reservation.setDateLimiteRetrait(dateRetrait);
             reservation.setEstActif(true);
             reservationRepository.save(reservation);
-            return "redirect:/bibliothecaire/dashboard";
+            return "redirect:/bibliothecaire/dashboard?success=reservation&livre=" + livre.getTitre() + "&adherent=" + adherent.getNom();
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la réservation : " + e.getMessage());
             model.addAttribute("reservation", reservation);
@@ -392,9 +443,16 @@ public class BibliothecaireController {
                 pret.setProlonge(true);
                 pret.setNombreProlongements(pret.getNombreProlongements() + 1);
                 pretRepository.save(pret);
-                return "redirect:/bibliothecaire/dashboard";
+                return "redirect:/bibliothecaire/dashboard?success=prolongation&livre=" + pret.getLivre().getTitre() + "&adherent=" + adherent.getNom();
             } else {
-                throw new IllegalArgumentException("Quota de prolongement atteint ou prêt déjà prolongé.");
+                if (pret.isProlonge()) {
+                    throw new IllegalArgumentException("❌ Prêt déjà prolongé : Ce prêt a déjà été prolongé une fois. " +
+                        "Les prêts ne peuvent être prolongés qu'une seule fois.");
+                } else {
+                    throw new IllegalArgumentException("❌ Quota de prolongement atteint : L'adhérent " + adherent.getNom() + 
+                        " a déjà utilisé " + pret.getNombreProlongements() + " prolongation(s) sur " + adherent.getQuotaProlongement() + " autorisée(s). " +
+                        "Quota : " + adherent.getQuotaProlongement() + " prolongation(s) pour un " + adherent.getCategorie().toLowerCase());
+                }
             }
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la prolongation : " + e.getMessage());
