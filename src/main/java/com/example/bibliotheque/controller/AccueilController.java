@@ -51,6 +51,11 @@ public class AccueilController {
                 reservations = Collections.emptyList();
             }
 
+            boolean abonnementActif = adherent.isAbonnementActif();
+            model.addAttribute("abonnementActif", abonnementActif);
+            model.addAttribute("dateDebutAbonnement", adherent.getDateDebutAbonnement());
+            model.addAttribute("dateFinAbonnement", adherent.getDateFinAbonnement());
+
             model.addAttribute("adherent", adherent);
             model.addAttribute("prets", prets);
             model.addAttribute("reservations", reservations);
@@ -60,6 +65,10 @@ public class AccueilController {
             System.out.println("Utilisateur : " + email);
             System.out.println("Autorités : " + auth.getAuthorities());
             System.out.println("Rôle de l'adhérent : " + adherent.getRole());
+            System.out.println("DEBUG - Date du jour : " + java.time.LocalDate.now());
+            System.out.println("DEBUG - Début abonnement : " + adherent.getDateDebutAbonnement());
+            System.out.println("DEBUG - Fin abonnement : " + adherent.getDateFinAbonnement());
+            System.out.println("DEBUG - Abonnement actif ? " + adherent.isAbonnementActif());
             
             // Vérifier le rôle de l'adhérent plutôt que les autorités
             if ("ROLE_ADMIN".equals(adherent.getRole())) {

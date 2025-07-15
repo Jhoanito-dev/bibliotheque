@@ -29,6 +29,7 @@ public class SecurityConfig {
                     "/js/**",
                     "/images/**"
                 ).permitAll()
+                .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/bibliothecaire/**").hasRole("ADMIN")
                 .requestMatchers("/adherent/**").hasRole("USER")
                 .anyRequest().authenticated()
