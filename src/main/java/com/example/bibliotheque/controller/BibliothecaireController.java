@@ -164,7 +164,6 @@ public class BibliothecaireController {
     public String emprunterLivre(@ModelAttribute Pret pret, @RequestParam String typePret, Model model) {
         try {
             Adherent adherent = adherentRepository.findById(pret.getAdherent().getId()).orElseThrow();
-            
             // Vérifier que c'est bien un adhérent
             if (!"ROLE_USER".equals(adherent.getRole())) {
                 throw new IllegalArgumentException("Seuls les adhérents peuvent emprunter des livres");
@@ -189,16 +188,26 @@ public class BibliothecaireController {
                     "' n'a plus d'exemplaires disponibles. Veuillez attendre qu'un exemplaire soit retourné.");
             }
 
-            pret.setDateEmprunt(LocalDate.now());
+            // Validation de la date de prêt
+            LocalDate dateEmprunt = pret.getDateEmprunt();
+            if (dateEmprunt == null) {
+                dateEmprunt = LocalDate.now();
+                pret.setDateEmprunt(dateEmprunt);
+            }
+            if (dateEmprunt.isAfter(LocalDate.now().plusDays(30))) {
+                throw new IllegalArgumentException("❌ La date de prêt ne peut pas être plus de 30 jours dans le futur.");
+            }
+            if (dateEmprunt.isBefore(LocalDate.now().minusDays(30))) {
+                throw new IllegalArgumentException("❌ La date de prêt ne peut pas être plus de 30 jours dans le passé.");
+            }
+
             pret.setTypePret(typePret);
-            
             int dureeMax;
             if ("surplace".equals(typePret)) {
                 dureeMax = 1;
             } else {
                 dureeMax = "Etudiant".equals(adherent.getCategorie()) ? 14 : 
                           "Professeur".equals(adherent.getCategorie()) ? 30 : 21;
-                
                 long pretsActifs = pretRepository.findByAdherentIdAndDateRetourEffectifIsNull(adherent.getId()).size();
                 if (pretsActifs >= adherent.getQuotaPret()) {
                     throw new IllegalArgumentException("❌ Quota de prêts atteint : L'adhérent " + adherent.getNom() + 
@@ -255,6 +264,37 @@ public class BibliothecaireController {
             pretRepository.save(pret);
         }
         return "redirect:/bibliothecaire/dashboard";
+    }
+
+    @PostMapping("/bibliothecaire/retourner-livre")
+    public String retournerLivreAvecDate(@RequestParam Long pretId, @RequestParam String dateRetour) {
+        Pret pret = pretRepository.findById(pretId).orElse(null);
+        if (pret == null || pret.getDateRetourEffectif() != null) {
+            return "redirect:/bibliothecaire/dashboard?error=Prêt introuvable ou déjà retourné";
+        }
+        LocalDate dateRetourEff;
+        try {
+            dateRetourEff = LocalDate.parse(dateRetour);
+        } catch (Exception e) {
+            return "redirect:/bibliothecaire/dashboard?error=Date de retour invalide";
+        }
+        pret.setDateRetourEffectif(dateRetourEff);
+        // Gérer la pénalité si le retour est en retard (hors prêt sur place)
+        if (!"surplace".equals(pret.getTypePret()) && dateRetourEff.isAfter(pret.getDateRetourPrevus())) {
+            pret.setPenaliteActive(true);
+            Adherent adherent = pret.getAdherent();
+            if ("ROLE_USER".equals(adherent.getRole())) {
+                adherent.setPenaliteJusquAu(dateRetourEff.plusDays(10));
+                adherentRepository.save(adherent);
+            }
+        }
+        // Remettre l'exemplaire au stock
+        Livre livre = pret.getLivre();
+        livre.setNombreExemplaires(livre.getNombreExemplaires() + 1);
+        livre.setDisponible(livre.getNombreExemplaires() > 0);
+        livreRepository.save(livre);
+        pretRepository.save(pret);
+        return "redirect:/bibliothecaire/dashboard?success=retour";
     }
 
     @GetMapping("/bibliothecaire/reserver-livre")
@@ -342,7 +382,7 @@ public class BibliothecaireController {
                 Pret pret = new Pret();
                 pret.setAdherent(demande.getAdherent());
                 pret.setLivre(demande.getLivre());
-                pret.setDateEmprunt(LocalDate.now());
+                pret.setDateEmprunt(demande.getDateSoumission());
                 pret.setTypePret(demande.getTypePret());
                 int dureeMax = "Etudiant".equals(demande.getAdherent().getCategorie()) ? 14 : "Professeur".equals(demande.getAdherent().getCategorie()) ? 30 : 21;
                 pret.setDateRetourPrevus(calculerDateRetour(pret.getDateEmprunt(), dureeMax));

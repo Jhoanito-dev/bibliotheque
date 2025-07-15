@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Component
+// @Component
 public class DataInitializer implements CommandLineRunner {
 
     private final LivreRepository livreRepository;
@@ -297,37 +297,37 @@ public class DataInitializer implements CommandLineRunner {
             entityManager.flush();
 
             // Créer des demandes en attente
-            Demande demande1 = new Demande();
-            demande1.setAdherent(adherent1);
-            demande1.setLivre(livre8);
-            demande1.setTypeDemande("emprunt");
-            demande1.setDateSoumission(LocalDate.now().minusDays(2));
-            demande1.setDateRetraitSouhaitee(LocalDate.now().plusDays(3));
-            demande1.setTypePret("maison");
-            demande1.setStatut("en attente");
-            demandeRepository.save(demande1);
+            // Demande demande1 = new Demande();
+            // demande1.setAdherent(adherent1);
+            // demande1.setLivre(livre8);
+            // demande1.setTypeDemande("emprunt");
+            // demande1.setDateSoumission(LocalDate.now().minusDays(2));
+            // demande1.setDateRetraitSouhaitee(LocalDate.now().plusDays(3));
+            // demande1.setTypePret("maison");
+            // demande1.setStatut("en attente");
+            // demandeRepository.save(demande1);
 
-            Demande demande2 = new Demande();
-            demande2.setAdherent(adherent3);
-            demande2.setLivre(livre1);
-            demande2.setTypeDemande("reservation");
-            demande2.setDateSoumission(LocalDate.now().minusDays(1));
-            demande2.setDateRetraitSouhaitee(LocalDate.now().plusDays(5));
-            demande2.setTypePret("surplace");
-            demande2.setStatut("en attente");
-            demandeRepository.save(demande2);
+            // Demande demande2 = new Demande();
+            // demande2.setAdherent(adherent3);
+            // demande2.setLivre(livre1);
+            // demande2.setTypeDemande("reservation");
+            // demande2.setDateSoumission(LocalDate.now().minusDays(1));
+            // demande2.setDateRetraitSouhaitee(LocalDate.now().plusDays(5));
+            // demande2.setTypePret("surplace");
+            // demande2.setStatut("en attente");
+            // demandeRepository.save(demande2);
 
-            Demande demande3 = new Demande();
-            demande3.setAdherent(adherent5);
-            demande3.setLivre(livre4);
-            demande3.setTypeDemande("emprunt");
-            demande3.setDateSoumission(LocalDate.now());
-            demande3.setDateRetraitSouhaitee(LocalDate.now().plusDays(7));
-            demande3.setTypePret("maison");
-            demande3.setStatut("en attente");
-            demandeRepository.save(demande3);
+            // Demande demande3 = new Demande();
+            // demande3.setAdherent(adherent5);
+            // demande3.setLivre(livre4);
+            // demande3.setTypeDemande("emprunt");
+            // demande3.setDateSoumission(LocalDate.now());
+            // demande3.setDateRetraitSouhaitee(LocalDate.now().plusDays(7));
+            // demande3.setTypePret("maison");
+            // demande3.setStatut("en attente");
+            // demandeRepository.save(demande3);
 
-            entityManager.flush();
+            // entityManager.flush();
 
             // Créer des jours fériés
             JourFerie jourFerie1 = new JourFerie();
@@ -348,7 +348,7 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Adhérents créés : 7 (6 utilisateurs + 1 admin)");
             System.out.println("Prêts actifs : 4");
             System.out.println("Réservations : 3");
-            System.out.println("Demandes en attente : 3");
+            // System.out.println("Demandes en attente : 3");
             System.out.println("Jours fériés : 2");
             System.out.println("==========================================");
     }
