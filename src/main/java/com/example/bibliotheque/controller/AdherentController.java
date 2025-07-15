@@ -3,9 +3,11 @@ package com.example.bibliotheque.controller;
 import com.example.bibliotheque.model.Adherent;
 import com.example.bibliotheque.model.Demande;
 import com.example.bibliotheque.model.Livre;
+import com.example.bibliotheque.model.Pret;
 import com.example.bibliotheque.repository.AdherentRepository;
 import com.example.bibliotheque.repository.DemandeRepository;
 import com.example.bibliotheque.repository.LivreRepository;
+import com.example.bibliotheque.repository.PretRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,9 @@ public class AdherentController {
 
     @Autowired
     private DemandeRepository demandeRepository;
+
+    @Autowired
+    private PretRepository pretRepository;
 
     @GetMapping("/adherent/emprunt")
     public String showEmpruntForm(Model model) {
@@ -50,7 +55,7 @@ public class AdherentController {
 
     @PostMapping("/adherent/emprunt/submit")
     public String submitEmprunt(@ModelAttribute Demande demande, @RequestParam Long livreId, 
-                              @RequestParam String typePret, Model model) {
+                              @RequestParam String typePret, @RequestParam(name = "dateEmprunt") String dateEmpruntStr, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
             String email = auth.getName();
@@ -83,12 +88,28 @@ public class AdherentController {
                 }
             }
 
+            // Prise en compte de la date de prêt saisie
+            LocalDate dateEmprunt;
+            try {
+                dateEmprunt = LocalDate.parse(dateEmpruntStr);
+            } catch (Exception e) {
+                return "redirect:/adherent/emprunt?error=Date de prêt invalide";
+            }
+            if (dateEmprunt.isAfter(LocalDate.now().plusDays(30))) {
+                return "redirect:/adherent/emprunt?error=La date de prêt ne peut pas être plus de 30 jours dans le futur";
+            }
+            if (dateEmprunt.isBefore(LocalDate.now().minusDays(30))) {
+                return "redirect:/adherent/emprunt?error=La date de prêt ne peut pas être plus de 30 jours dans le passé";
+            }
+
             demande.setAdherent(adherent);
             demande.setLivre(livre);
             demande.setDateSoumission(LocalDate.now());
             demande.setTypeDemande("pret");
             demande.setTypePret(typePret);
             demande.setStatut("en attente");
+            demande.setDateRetraitSouhaitee(null);
+            demande.setDateSoumission(dateEmprunt); // Utilisation de la date de prêt comme date de soumission
             demandeRepository.save(demande);
             return "redirect:/accueil?success=Demande d'emprunt envoyée";
         }
@@ -161,6 +182,41 @@ public class AdherentController {
             demande.setStatut("en attente");
             demandeRepository.save(demande);
             return "redirect:/accueil?success=Demande de réservation envoyée";
+        }
+        return "redirect:/login";
+    }
+
+    @PostMapping("/adherent/retourner-livre")
+    public String rendreLivre(@RequestParam Long pretId, @RequestParam String dateRetour) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
+            Pret pret = pretRepository.findById(pretId).orElse(null);
+            if (pret == null || pret.getDateRetourEffectif() != null) {
+                return "redirect:/accueil?error=Prêt introuvable ou déjà retourné";
+            }
+            LocalDate dateRetourEff;
+            try {
+                dateRetourEff = LocalDate.parse(dateRetour);
+            } catch (Exception e) {
+                return "redirect:/accueil?error=Date de retour invalide";
+            }
+            pret.setDateRetourEffectif(dateRetourEff);
+            // Gérer la pénalité si le retour est en retard (hors prêt sur place)
+            if (!"surplace".equals(pret.getTypePret()) && dateRetourEff.isAfter(pret.getDateRetourPrevus())) {
+                pret.setPenaliteActive(true);
+                Adherent adherent = pret.getAdherent();
+                if ("ROLE_USER".equals(adherent.getRole())) {
+                    adherent.setPenaliteJusquAu(dateRetourEff.plusDays(10));
+                    adherentRepository.save(adherent);
+                }
+            }
+            // Remettre l'exemplaire au stock
+            Livre livre = pret.getLivre();
+            livre.setNombreExemplaires(livre.getNombreExemplaires() + 1);
+            livre.setDisponible(livre.getNombreExemplaires() > 0);
+            livreRepository.save(livre);
+            pretRepository.save(pret);
+            return "redirect:/accueil?success=Livre rendu avec succès";
         }
         return "redirect:/login";
     }

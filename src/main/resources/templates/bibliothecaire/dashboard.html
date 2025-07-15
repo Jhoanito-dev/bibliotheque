@@ -163,9 +163,14 @@
                                         <a th:if="${pret.typePret == 'maison'}" th:href="@{'/bibliothecaire/prolonger-pret/' + ${pret.id}}" class="btn btn-sm btn-outline-primary me-2">
                                             <i class="bi bi-calendar-plus"></i> Prolonger
                                         </a>
-                                        <a th:href="@{'/bibliothecaire/retourner-livre/' + ${pret.id}}" class="btn btn-sm btn-outline-success">
-                                            <i class="bi bi-arrow-return-left"></i> Retourner
-                                        </a>
+                                        <!-- Formulaire pour retourner le livre avec saisie de la date -->
+                                        <form th:action="@{/bibliothecaire/retourner-livre}" method="post" class="d-inline-flex align-items-center gap-2">
+                                            <input type="hidden" name="pretId" th:value="${pret.id}" />
+                                            <input type="date" name="dateRetour" class="form-control form-control-sm" required max="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}" style="width: 130px;" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                <i class="bi bi-arrow-return-left"></i> Retourner
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             </tbody>

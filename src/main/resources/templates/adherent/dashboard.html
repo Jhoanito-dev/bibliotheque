@@ -98,6 +98,16 @@
                                                 <td data-label="Livre" th:text="${pret.livre.titre}"></td>
                                                 <td data-label="Date emprunt" th:text="${#temporals.format(pret.dateEmprunt, 'dd/MM/yyyy')}"></td>
                                                 <td data-label="Date retour" th:text="${#temporals.format(pret.dateRetourPrevus, 'dd/MM/yyyy')}"></td>
+                                                <td>
+                                                    <!-- Formulaire pour rendre le livre avec saisie de la date -->
+                                                    <form th:action="@{/adherent/retourner-livre}" method="post" class="d-flex align-items-center gap-2">
+                                                        <input type="hidden" name="pretId" th:value="${pret.id}" />
+                                                        <input type="date" name="dateRetour" class="form-control form-control-sm" required max="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}" style="width: 150px;" />
+                                                        <button type="submit" class="btn btn-success btn-sm">
+                                                            <i class="bi bi-arrow-return-left"></i> Rendre
+                                                        </button>
+                                                    </form>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

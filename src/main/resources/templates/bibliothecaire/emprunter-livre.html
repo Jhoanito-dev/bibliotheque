@@ -49,6 +49,11 @@
                         <small class="text-muted">Les livres sans exemplaires disponibles sont grisés</small>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="bi bi-calendar"></i> Date de prêt :</label>
+                        <input type="date" th:field="*{dateEmprunt}" class="form-control" required>
+                        <small class="text-muted">Par défaut aujourd'hui, mais vous pouvez choisir une autre date.</small>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-bold"><i class="bi bi-bookmark"></i> Type de prêt :</label>
                         <select name="typePret" class="form-select" required>
                             <option value="surplace">Sur place</option>

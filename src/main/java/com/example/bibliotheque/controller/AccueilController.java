@@ -4,6 +4,7 @@ import com.example.bibliotheque.model.Adherent;
 import com.example.bibliotheque.model.Pret;
 import com.example.bibliotheque.repository.AdherentRepository;
 import com.example.bibliotheque.repository.PretRepository;
+import com.example.bibliotheque.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +24,9 @@ public class AccueilController {
     @Autowired
     private PretRepository pretRepository;
 
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     @GetMapping("/")
     public String root() {
         return "redirect:/login";
@@ -41,8 +45,15 @@ public class AccueilController {
                 prets = Collections.emptyList();
             }
 
+            // Fetch active reservations for this adherent
+            List<com.example.bibliotheque.model.Reservation> reservations = reservationRepository.findByAdherentIdAndEstActifTrue(adherent.getId());
+            if (reservations == null) {
+                reservations = Collections.emptyList();
+            }
+
             model.addAttribute("adherent", adherent);
             model.addAttribute("prets", prets);
+            model.addAttribute("reservations", reservations);
 
             // Debug: afficher les autorités
             System.out.println("=== REDIRECTION APRÈS CONNEXION ===");
