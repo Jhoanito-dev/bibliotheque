@@ -38,6 +38,11 @@ CREATE TABLE adherent (
     quota_prolongement INTEGER NOT NULL DEFAULT 0
 );
 
+-- Ajout des colonnes pour la gestion d'abonnement des adhérents
+ALTER TABLE adherent
+    ADD COLUMN date_debut_abonnement DATE,
+    ADD COLUMN date_fin_abonnement DATE;
+
 -- Creating the Demande table
 CREATE TABLE demande (
     id BIGSERIAL PRIMARY KEY,

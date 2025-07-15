@@ -26,6 +26,8 @@ public class Adherent {
     private Integer quotaPret; // Changé en Integer pour pouvoir être null
     private Integer quotaReservation;
     private Integer quotaProlongement;
+    private LocalDate dateDebutAbonnement;
+    private LocalDate dateFinAbonnement;
 
     // Relation OneToMany avec Pret
     @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -38,5 +40,13 @@ public class Adherent {
     // Méthode pour vérifier si c'est un adhérent (et non un admin)
     public boolean isAdherent() {
         return "USER".equals(this.role);
+    }
+
+    // Vérifie si l'abonnement est actif
+    public boolean isAbonnementActif() {
+        LocalDate today = LocalDate.now();
+        return dateDebutAbonnement != null && dateFinAbonnement != null &&
+                (today.isEqual(dateDebutAbonnement) || today.isAfter(dateDebutAbonnement)) &&
+                (!today.isAfter(dateFinAbonnement));
     }
 }

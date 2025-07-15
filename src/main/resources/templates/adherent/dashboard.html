@@ -32,6 +32,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
 
+                <!-- Affichage de l'état de l'abonnement -->
+                <div th:if="${abonnementActif}" class="alert alert-success d-flex align-items-center mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>Votre abonnement est <strong>actif</strong> jusqu'au 
+                        <span th:text="${#temporals.format(dateFinAbonnement, 'dd/MM/yyyy')}"></span>.
+                    </span>
+                </div>
+                <div th:if="${!abonnementActif}" class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span>Votre abonnement est <strong>expiré</strong> depuis le 
+                        <span th:text="${#temporals.format(dateFinAbonnement, 'dd/MM/yyyy')}"></span>.
+                        Veuillez contacter un bibliothécaire pour le renouveler.
+                    </span>
+                </div>
+
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="card h-100">

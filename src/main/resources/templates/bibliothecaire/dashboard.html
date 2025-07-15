@@ -107,6 +107,9 @@
                                     <th>Catégorie</th>
                                     <th>Quota Prêt</th>
                                     <th>Quota Réservation</th>
+                                    <th>Début abonnement</th>
+                                    <th>Fin abonnement</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -122,6 +125,13 @@
                                     <td th:text="${adherent.categorie}"></td>
                                     <td th:text="${adherent.quotaPret}"></td>
                                     <td th:text="${adherent.quotaReservation}"></td>
+                                    <td th:text="${adherent.dateDebutAbonnement != null ? #temporals.format(adherent.dateDebutAbonnement, 'dd/MM/yyyy') : '-'}"></td>
+                                    <td th:text="${adherent.dateFinAbonnement != null ? #temporals.format(adherent.dateFinAbonnement, 'dd/MM/yyyy') : '-'}"></td>
+                                    <td>
+                                        <a th:href="@{'/bibliothecaire/renouveler-abonnement/' + ${adherent.id}}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-arrow-repeat"></i> Renouveler l'abonnement
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

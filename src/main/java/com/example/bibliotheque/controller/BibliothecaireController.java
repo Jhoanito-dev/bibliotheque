@@ -168,6 +168,10 @@ public class BibliothecaireController {
             if (!"ROLE_USER".equals(adherent.getRole())) {
                 throw new IllegalArgumentException("Seuls les adhérents peuvent emprunter des livres");
             }
+            // Vérifier l'abonnement actif
+            if (!adherent.isAbonnementActif()) {
+                throw new IllegalArgumentException("❌ L'abonnement de l'adhérent " + adherent.getNom() + " est expiré ou non valide. Impossible d'emprunter tant que l'abonnement n'est pas actif.");
+            }
 
             Livre livre = livreRepository.findById(pret.getLivre().getId()).orElseThrow();
 
@@ -318,6 +322,10 @@ public class BibliothecaireController {
             // Vérifier que c'est bien un adhérent
             if (!"ROLE_USER".equals(adherent.getRole())) {
                 throw new IllegalArgumentException("Seuls les adhérents peuvent réserver des livres");
+            }
+            // Vérifier l'abonnement actif
+            if (!adherent.isAbonnementActif()) {
+                throw new IllegalArgumentException("❌ L'abonnement de l'adhérent " + adherent.getNom() + " est expiré ou non valide. Impossible de réserver tant que l'abonnement n'est pas actif.");
             }
 
             Livre livre = livreRepository.findById(reservation.getLivre().getId()).orElseThrow();
@@ -497,6 +505,30 @@ public class BibliothecaireController {
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la prolongation : " + e.getMessage());
             return "redirect:/bibliothecaire/dashboard";
+        }
+    }
+
+    @GetMapping("/bibliothecaire/renouveler-abonnement/{id}")
+    public String showRenouvellementAbonnementForm(@PathVariable Long id, Model model) {
+        Adherent adherent = adherentRepository.findById(id).orElseThrow(() -> new RuntimeException("Adhérent non trouvé"));
+        model.addAttribute("adherent", adherent);
+        return "bibliothecaire/renouveler-abonnement";
+    }
+
+    @PostMapping("/bibliothecaire/renouveler-abonnement")
+    public String renouvelerAbonnement(@RequestParam Long adherentId,
+                                       @RequestParam String dateDebutAbonnement,
+                                       @RequestParam String dateFinAbonnement,
+                                       Model model) {
+        try {
+            Adherent adherent = adherentRepository.findById(adherentId).orElseThrow(() -> new RuntimeException("Adhérent non trouvé"));
+            adherent.setDateDebutAbonnement(java.time.LocalDate.parse(dateDebutAbonnement));
+            adherent.setDateFinAbonnement(java.time.LocalDate.parse(dateFinAbonnement));
+            adherentRepository.save(adherent);
+            return "redirect:/bibliothecaire/dashboard?success=renouvellement&adherent=" + adherent.getNom();
+        } catch (Exception e) {
+            model.addAttribute("error", "Erreur lors du renouvellement : " + e.getMessage());
+            return "bibliothecaire/renouveler-abonnement";
         }
     }
 }
